@@ -1,0 +1,26 @@
+{
+  "name": "spindizzy",
+  "version": "1.0.0",
+  "description": "remake of atari 8bit game called spindizzy",
+  "main": "./src/main.js",
+  "scripts": {
+    "start": "webpack --watch",
+    "test": "jasmine ./build/test.bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/koziejka/spindizzy-remake.git"
+  },
+  "author": "Maciej Kozieja <koziejka.com@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/koziejka/spindizzy-remake/issues"
+  },
+  "homepage": "https://github.com/koziejka/spindizzy-remake#readme",
+  "devDependencies": {
+    "html-webpack-plugin": "^2.28.0",
+    "jasmine": "^2.5.3",
+    "raw-loader": "^0.5.1",
+    "webpack": "^2.2.1"
+  }
+}

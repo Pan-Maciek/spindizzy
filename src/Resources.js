@@ -14,13 +14,13 @@ const __RESOURCES__ = {
     maps: {}
 }
 
-load('0000', `${location.href}/maps/map0000.json`)
-load('0100', `${location.href}/maps/map0100.json`)
-load('0001', `${location.href}/maps/map0001.json`)
-load('0002', `${location.href}/maps/map0002.json`)
-load('0010', `${location.href}/maps/map0010.json`)
-load('0020', `${location.href}/maps/map0020.json`)
-load('0102', `${location.href}/maps/map0102.json`)
+load('0000', `${location.href}/resources/maps/map0000.json`)
+load('0100', `${location.href}/resources/maps/map0100.json`)
+load('0001', `${location.href}/resources/maps/map0001.json`)
+load('0002', `${location.href}/resources/maps/map0002.json`)
+load('0010', `${location.href}/resources/maps/map0010.json`)
+load('0020', `${location.href}/resources/maps/map0020.json`)
+load('0102', `${location.href}/resources/maps/map0102.json`)
 
 export const waitForResources = () => Promise.all(__PRIMISSES__)
 

@@ -25,6 +25,7 @@ export default function Game({
     control = window
 }) {
 
+    // initializing webgl
     const canvas = document.createElement('canvas')
 
     const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
@@ -34,8 +35,17 @@ export default function Game({
         appendTo.appendChild(div)
         return
     }
+
     gl.enable(gl.DEPTH_TEST)
     gl.depthFunc(gl.LEQUAL)
+
+    // creating programs
+    const bp = BasicProgram(gl) // basicProgram
+    const pp = new PixelProgram(gl, canvas) // PixelizeProgram
+    bp.use()
+    bp.projection.set(projectionMatrix)
+
+    // initializing DOM
     appendTo.appendChild(canvas)
 
     control.addEventListener('keydown', e => {
@@ -65,17 +75,11 @@ export default function Game({
                 break
         }
     })
+
     let move = [0, 0]
 
     let w = canvas.width = appendTo.clientWidth
     let h = canvas.height = appendTo.clientHeight
-
-    const bp = BasicProgram(gl) // basicProgram
-    const pp = new PixelProgram(gl, canvas) // PixelizeProgram
-
-
-    bp.use()
-    bp.set({ projection: projectionMatrix })
 
     let i = 0, length
     this.map = null
@@ -83,29 +87,31 @@ export default function Game({
     this.player = new Player([0, 0, 0])
     gl.clearColor(64 / 255, 21 / 255, 207 / 255, 1)
 
-    let acc = 0, lastTime, neadRedraw = true, running = false
-
     const update = () => {
 
     }
 
     const draw = () => {
-        bp.use()
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
         pp.begin()
 
-        if (this.map) this.map.draw(bp, gl)
+        bp.use()
+        if (this.map)
+            this.map.draw(bp, gl)
 
         this.player.draw(bp, gl)
         pp.end()
     }
 
+    // varibles for gameLoop - prevent gc, sabelize performance
+    let acc = 0, lastTime, neadRedraw = true, running = false
+
     const gameLoop = (time) => {
         if (!running) return
         requestAnimationFrame(gameLoop)
 
-        meter.tickStart()
+        meter.tickStart() // fps meter
         acc += time - lastTime
         lastTime = time
 
@@ -116,7 +122,7 @@ export default function Game({
         }
         if (neadRedraw) draw()
 
-        meter.tick()
+        meter.tick() // fps meter
     }
 
     this.start = () => {

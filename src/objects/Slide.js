@@ -1,4 +1,4 @@
-import { drawShape, shape } from '../shape'
+import { drawShape, shape } from '../Shape'
 import Vec3 from '../math/Vec3'
 import Settings from '../Settings'
 

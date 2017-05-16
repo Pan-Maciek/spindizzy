@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 23);
+/******/ 	return __webpack_require__(__webpack_require__.s = 24);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -120,8 +120,28 @@ const shape = (points, t) => {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__net_remote__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Map__ = __webpack_require__(24);
+/* harmony default export */ __webpack_exports__["a"] = {
+    pixelFilter: true,
+    pixelResolution: 350, // px
+    frameTime: 30, // ms
+    projectionAngle: 28,
+    keys: {
+        fire: 'space',
+        top: 'W',
+        left: 'A',
+        bottom: 'S',
+        rigth: 'D'
+    },
+    blocksSpacing: 0.06, // %
+};
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__net_remote__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Map__ = __webpack_require__(4);
 
 
 
@@ -153,13 +173,11 @@ const waitForResources = () => Promise.all(__PRIMISSES__)
 /* harmony default export */ __webpack_exports__["b"] = __RESOURCES__;
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/** Class representing a 3d vector.
- * @version 0.0.2
- */
+/** Class representing a 3d vector. */
 class Vec3 extends Float32Array {
 
     constructor(x = 0, y = 0, z = 0) {
@@ -272,13 +290,99 @@ class Vec3 extends Float32Array {
 
 
 /***/ }),
-/* 3 */
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Style__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__objects_Flat__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__objects_Slide__ = __webpack_require__(23);
+
+
+
+
+const position0 = new Float32Array([0, 0, 0])
+
+class Map {
+
+    constructor(map) {
+
+        this.styleGroups = []
+        this.elements = []
+        let i
+
+        for (let group of map) {
+            let topPoints = [], sidePoints = [], botPoints = []
+            this.styleGroups.push({
+                botPoints, topPoints, sidePoints,
+                style: new __WEBPACK_IMPORTED_MODULE_0__Style__["a" /* default */](group.style)
+            })
+            for (i = 0; i < group.elements.length; i++) {
+                const [type, ...args] = group.elements[i]
+                switch (type.toLowerCase()) {
+                    case 'flat':
+                        var block = new __WEBPACK_IMPORTED_MODULE_1__objects_Flat__["a" /* default */](...args)
+                        break
+                    case 'slide':
+                        var block = new __WEBPACK_IMPORTED_MODULE_2__objects_Slide__["a" /* default */](...args)
+                        break
+                }
+                topPoints.push(...block.top.points)
+                sidePoints.push(...block.sides[1].points)
+                sidePoints.push(...block.sides[2].points)
+                botPoints.push(...block.bottom)
+                this.elements.push(block)
+            }
+        }
+
+        for (i = 0; i < this.styleGroups.length; i++) {
+            this.styleGroups[i].topPoints = new Float32Array(this.styleGroups[i].topPoints)
+            this.styleGroups[i].toplength = this.styleGroups[i].topPoints.length / 3
+            this.styleGroups[i].sidePoints = new Float32Array(this.styleGroups[i].sidePoints)
+            this.styleGroups[i].sidelength = this.styleGroups[i].sidePoints.length / 3
+            this.styleGroups[i].botPoints = new Float32Array(this.styleGroups[i].botPoints)
+            this.styleGroups[i].botlength = this.styleGroups[i].botPoints.length / 3
+        }
+
+    }
+
+    draw(bp, gl) {
+        for (var i = 0; i < this.styleGroups.length; i++) {
+            bp.position.set(position0)
+            bp.vert.set(this.styleGroups[i].topPoints)
+
+            bp.color.set(this.styleGroups[i].style.top.fill)
+            gl.drawArrays(gl.TRIANGLES, 0, this.styleGroups[i].toplength)
+
+            bp.color.set(this.styleGroups[i].style.top.stroke)
+            gl.drawArrays(gl.LINES, 0, this.styleGroups[i].toplength)
+
+            bp.vert.set(this.styleGroups[i].sidePoints)
+
+            bp.color.set(this.styleGroups[i].style.sides.fill)
+            gl.drawArrays(gl.TRIANGLES, 0, this.styleGroups[i].sidelength)
+
+            bp.color.set(this.styleGroups[i].style.sides.stroke)
+            gl.drawArrays(gl.LINES, 0, this.styleGroups[i].sidelength)
+
+
+            bp.vert.set(this.styleGroups[i].botPoints)
+            gl.drawArrays(gl.LINES, 0, this.styleGroups[i].botlength)
+ 
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Map;
+
+
+/***/ }),
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shape__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__math_Vec3__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Style__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__math_Vec3__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Style__ = __webpack_require__(7);
 
 
 
@@ -337,43 +441,54 @@ class Player {
 
 
 /***/ }),
-/* 4 */,
-/* 5 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+const postData = object => {
+    if (!object) return null
+    let data = ''
+    for (var key in object)
+        data += `&${encodeURIComponent(key)}=${encodeURIComponent(object[key])}`
+    return data.substring(1)
+}
+
+/** Request data from server.
+ * 
+ * @param {{url:String, data, method: String}} options
+ * @returns {Promise}
+ */
+const req = (options) => {
+    return new Promise((resolve, reject) => {
+        const xmlHttp = new XMLHttpRequest()
+        xmlHttp.onreadystatechange = () => {
+            if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+                resolve(xmlHttp.responseText)
+        }
+        xmlHttp.open(options.method || 'GET', options.url, true)
+        xmlHttp.send(postData(options.data))
+    })
+}
+
 /* harmony default export */ __webpack_exports__["a"] = {
-    get(options, callback) {
-        return new Promise((resolve, reject) => {
-            const xmlHttp = new XMLHttpRequest()
-            xmlHttp.onreadystatechange = () => {
-                if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-                    if (callback) callback(xmlHttp.responseText)
-                    resolve(xmlHttp.responseText)
-                }
-            }
-            xmlHttp.open(options.method || "GET", options.url, true)
-            xmlHttp.send(null)
-        })
-    },
-    json(options, callback) {
-        return new Promise((resolve, reject) => {
-            const xmlHttp = new XMLHttpRequest()
-            xmlHttp.onreadystatechange = () => {
-                if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-                    const data = JSON.parse(xmlHttp.responseText)
-                    if (callback) callback(data)
-                    resolve(data)
-                }
-            }
-            xmlHttp.open(options.method || "GET", options.url, true)
-            xmlHttp.send(null)
-        })
-    }
+
+    /** Get data using axaj.
+     * 
+     * @param {{url:String, data, method: String}} options
+     * @returns {Promise}
+     */
+    get(options) { return req(options) },
+
+    /** Get data  using axaj and parser it using JSON.parse().
+     * 
+     * @param {{url:String, data, method: String}} options
+     * @returns {Promise}
+     */
+    json(options) { return req(options).then(data => JSON.parse(data)) }
 };
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -402,18 +517,28 @@ class Style {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Shader__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Attribute__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Uniform__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Shader__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Attribute__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Uniform__ = __webpack_require__(17);
 
 
 
 
+/** Appends Attributes and Uniforms from source to target.
+ * 
+ * @param {Object} target 
+ * @param {WebGLRenderingContext} gl 
+ * @param {WebGLProgram} program 
+ * @param {String} source
+ */
 const appendAU = (target, gl, program, source) => {
+    
+    gl.useProgram(program)
+
     const regex = /^(attribute|uniform)\s+(\w+)\s+(\w+)\s*;/gm
     let temp
     while (temp = regex.exec(source)) {
@@ -432,25 +557,21 @@ const appendAU = (target, gl, program, source) => {
 
 class Program {
 
-    /**
+    /** Creates Program.
      * @param {WebGLRenderingContext} gl
      */
     constructor(gl, ...shaders) {
 
         const program = gl.createProgram()
-        for (let i = 0; i < shaders.length; i++) {
-            if (typeof shaders[i] === 'string') {
-                if (/gl_Position/.test(shaders[i])) // test if source is vertex shader
-                    shaders[i] = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shader__["a" /* createVertexShader */])(gl, shaders[i])
-                else
-                    shaders[i] = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shader__["b" /* createFragmentShader */])(gl, shaders[i])
-            }
+
+        for (let i = 0; i < shaders.length; i++) { // creating and attaching shaders
+            if (typeof shaders[i] === 'string')
+                shaders[i] = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shader__["a" /* createShader */])(gl, shaders[i])
             gl.attachShader(program, shaders[i])
         }
-        gl.linkProgram(program)
 
-        // checking for errors
-        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        gl.linkProgram(program) // linking program
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) { // checking for linking errors
             console.error(`Failed to link program: ${gl.getProgramInfoLog(program)}`)
             gl.deleteProgram(program)
             gl.deleteShader(fragment)
@@ -458,10 +579,9 @@ class Program {
             return null
         }
 
-        // checking for errors
-        gl.validateProgram(program)
-        if (!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {
-            console.error(`Failed to link program: ${gl.getProgramInfoLog(program)}`)
+        gl.validateProgram(program) // validating program
+        if (!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {// checking for errors
+            console.error(`Program validation failed: ${gl.getProgramInfoLog(program)}`)
             gl.deleteProgram(program)
             gl.deleteShader(fragment)
             gl.deleteShader(vertex)
@@ -473,7 +593,6 @@ class Program {
             else return source + obj.source + '\n'
         }, '')
         // appending atributes and uniforms
-        gl.useProgram(program)
         appendAU(this, gl, program, fullSource)
 
         this.__program__ = program
@@ -481,15 +600,19 @@ class Program {
         this.shaders = shaders
     }
 
+    /** Set program as active. */
     use() {
         this.gl.useProgram(this.__program__)
     }
 
+    /** Set all properties of pprogram at once. */
     set(obj) {
         for (let name in obj) {
             this[name].set(obj[name])
         }
     }
+
+    /** Call gl.drawArrays. */
     draw(n, mode = 'POINTS') {
         this.gl.drawArrays(this.gl[mode.toUpperCase()], 0, n)
     }
@@ -498,7 +621,7 @@ class Program {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -516,16 +639,16 @@ const typeSize = type => __SIZE__[type]
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__math_Mat4__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__math_Util__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__entities_Player__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__gl_programs_basic_Program__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__gl_programs_pixelize_Program__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Settings__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__math_Mat4__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__math_Util__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__entities_Player__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__gl_programs_basic_Program__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__gl_programs_pixelize_Program__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Settings__ = __webpack_require__(1);
 /* harmony export (immutable) */ __webpack_exports__["a"] = Game;
 
 
@@ -554,6 +677,7 @@ function Game({
     control = window
 }) {
 
+    // initializing webgl
     const canvas = document.createElement('canvas')
 
     const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
@@ -563,8 +687,17 @@ function Game({
         appendTo.appendChild(div)
         return
     }
+
     gl.enable(gl.DEPTH_TEST)
     gl.depthFunc(gl.LEQUAL)
+
+    // creating programs
+    const bp = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__gl_programs_basic_Program__["a" /* default */])(gl) // basicProgram
+    const pp = new __WEBPACK_IMPORTED_MODULE_4__gl_programs_pixelize_Program__["a" /* default */](gl, canvas) // PixelizeProgram
+    bp.use()
+    bp.projection.set(projectionMatrix)
+
+    // initializing DOM
     appendTo.appendChild(canvas)
 
     control.addEventListener('keydown', e => {
@@ -594,17 +727,11 @@ function Game({
                 break
         }
     })
+
     let move = [0, 0]
 
     let w = canvas.width = appendTo.clientWidth
     let h = canvas.height = appendTo.clientHeight
-
-    const bp = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__gl_programs_basic_Program__["a" /* default */])(gl) // basicProgram
-    const pp = new __WEBPACK_IMPORTED_MODULE_4__gl_programs_pixelize_Program__["a" /* default */](gl, canvas) // PixelizeProgram
-
-
-    bp.use()
-    bp.set({ projection: projectionMatrix })
 
     let i = 0, length
     this.map = null
@@ -612,29 +739,31 @@ function Game({
     this.player = new __WEBPACK_IMPORTED_MODULE_2__entities_Player__["a" /* default */]([0, 0, 0])
     gl.clearColor(64 / 255, 21 / 255, 207 / 255, 1)
 
-    let acc = 0, lastTime, neadRedraw = true, running = false
-
     const update = () => {
 
     }
 
     const draw = () => {
-        bp.use()
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
         pp.begin()
 
-        if (this.map) this.map.draw(bp, gl)
+        bp.use()
+        if (this.map)
+            this.map.draw(bp, gl)
 
         this.player.draw(bp, gl)
         pp.end()
     }
 
+    // varibles for gameLoop - prevent gc, sabelize performance
+    let acc = 0, lastTime, neadRedraw = true, running = false
+
     const gameLoop = (time) => {
         if (!running) return
         requestAnimationFrame(gameLoop)
 
-        meter.tickStart()
+        meter.tickStart() // fps meter
         acc += time - lastTime
         lastTime = time
 
@@ -645,7 +774,7 @@ function Game({
         }
         if (neadRedraw) draw()
 
-        meter.tick()
+        meter.tick() // fps meter
     }
 
     this.start = () => {
@@ -664,47 +793,47 @@ function Game({
 }
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 module.exports = "precision lowp float;\r\n\r\nuniform vec3 color;\r\n\r\nvoid main() {\r\n    gl_FragColor = vec4(color, 1);\r\n}"
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 module.exports = "precision lowp float;\r\n\r\nattribute vec3 vert;\r\n\r\nuniform vec3 position;\r\nuniform mat4 projection;\r\n\r\nvoid main() {\r\n    gl_Position = projection * vec4(vert + position, 1);\r\n}"
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
 module.exports = "precision lowp float;\r\n\r\nvarying vec2 v_texcoord;\r\n\r\nuniform sampler2D texture;\r\n\r\nvoid main() {\r\n  gl_FragColor = texture2D(texture, v_texcoord);\r\n}"
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports) {
 
 module.exports = "precision lowp float;\r\n\r\nattribute vec2 position;\r\nattribute vec2 texcoord;\r\n\r\nvarying vec2 v_texcoord;\r\n\r\nvoid main() {\r\n   gl_Position = vec4(position, 0, 1);\r\n   v_texcoord = texcoord;\r\n}"
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__types_js__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__types_js__ = __webpack_require__(9);
 
 
 class Attribute {
 
-    /**
+    /** Creates attribute.
      * @param {WebGLRenderingContext} gl
      * @param {WebGLProgram} program
      * @param {String} name
      * @param {String} type
      */
     constructor(gl, program, name, type) {
-        
+
         this.gl = gl
         this.name = name
         this.size = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__types_js__["a" /* typeSize */])(type)
@@ -714,6 +843,10 @@ class Attribute {
 
     }
 
+    /** Sets value of curent attribute and enables it.
+     *  NOTE: Remember to use program.
+     * @param {Float32Array} value 
+     */
     set(value) {
         this.gl.enableVertexAttribArray(this.__location__)
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.__buffer__)
@@ -727,19 +860,28 @@ class Attribute {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-const createShader = (gl, type, source) => {
+/** Create webgl shader.
+ *
+ * @param {WebGLRenderingContext} gl 
+ * @param {String} source
+ * @returns {WebGLShader}
+ */
+const createShader = (gl, source) => {
+
+    const type = /gl_Position/.test(source)
+        ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER
 
     const shader = gl.createShader(type)
-
     gl.shaderSource(shader, source)
-    gl.compileShader(shader)
 
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        console.error(`An error occurred while compiling the shaders: ${gl.getShaderInfoLog(shader)}`)
+    gl.compileShader(shader) // compiling shader
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) { // checking for comiplation errors
+        console.error(`An error occurred while compiling the shader: ${gl.getShaderInfoLog(shader)}`)
+        console.error('Shader source:\n', source)
         gl.deleteShader(shader)
         return null
     }
@@ -747,47 +889,42 @@ const createShader = (gl, type, source) => {
     shader.source = source
     return shader
 }
-
-const createFragmentShader = (gl, source) =>
-    createShader(gl, gl.FRAGMENT_SHADER, source)
-/* harmony export (immutable) */ __webpack_exports__["b"] = createFragmentShader;
-
-
-const createVertexShader = (gl, source) =>
-    createShader(gl, gl.VERTEX_SHADER, source)
-/* harmony export (immutable) */ __webpack_exports__["a"] = createVertexShader;
-
+/* harmony export (immutable) */ __webpack_exports__["a"] = createShader;
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__types__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__types__ = __webpack_require__(9);
 
 
 class Uniform {
 
-    /**
+    /** Creates Uniform.
      * @param {WebGLRenderingContext} gl
      * @param {WebGLProgram} program
      * @param {String} name
      * @param {String} type
      */
     constructor(gl, program, name, type) {
+        
         this.gl = gl
         this.name = name
+        
         this.size = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__types__["a" /* typeSize */])(type)
         this.type = type
+
         this.__location__ = this.gl.getUniformLocation(program, name)
         this.__program__ = program
     }
 
+    /** Sets value of curent attribute and enables it.
+     *  NOTE: Remember to use program.
+     * @param {Float32Array} value 
+     */
     set(value) {
-        if (value.toFloat32Array)
-            value = value.toFloat32Array()
-
         switch (this.size) {
             case 3:
                 this.gl.uniform3fv(this.__location__, value)
@@ -805,33 +942,38 @@ class Uniform {
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Program__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Vertex_glsl__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Program__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Vertex_glsl__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Vertex_glsl___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__Vertex_glsl__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Fragment_glsl__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Fragment_glsl__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Fragment_glsl___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__Fragment_glsl__);
 
 
 
 
 
+/** Basic Program.
+ * Flat color.
+ * Projection matrix.
+ * Position.
+ */
 /* harmony default export */ __webpack_exports__["a"] = gl => new __WEBPACK_IMPORTED_MODULE_0__Program__["a" /* default */](gl, __WEBPACK_IMPORTED_MODULE_1__Vertex_glsl___default.a, __WEBPACK_IMPORTED_MODULE_2__Fragment_glsl___default.a);
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Program__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__vertex_glsl__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Program__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__vertex_glsl__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__vertex_glsl___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__vertex_glsl__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__fragment_glsl__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__fragment_glsl__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__fragment_glsl___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__fragment_glsl__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Settings__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Settings__ = __webpack_require__(1);
 
 
 
@@ -892,7 +1034,7 @@ class PixelFilter extends __WEBPACK_IMPORTED_MODULE_0__Program__["a" /* default 
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -996,18 +1138,18 @@ class Mat4 extends Float32Array {
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-const _PI180_ = Math.PI / 180
-const _180PI_ = 180 / Math.PI
+const __PI180__ = Math.PI / 180
+const __180PI__ = 180 / Math.PI
 
 /** Convert degrees to radians.
  * @param {Number} deg degrees
  * @returns {Number}
  */
-const degToRad = deg => deg * _PI180_
+const degToRad = deg => deg * __PI180__
 /* harmony export (immutable) */ __webpack_exports__["a"] = degToRad;
 
 
@@ -1015,18 +1157,18 @@ const degToRad = deg => deg * _PI180_
  * @param {Number} deg radians
  * @returns {Number}
  */
-const radToDeg = deg => deg * _180PI_
+const radToDeg = deg => deg * __180PI__
 /* unused harmony export radToDeg */
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shape__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__math_Vec3__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Settings__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Shape__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__math_Vec3__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Settings__ = __webpack_require__(1);
 
 
 
@@ -1041,22 +1183,22 @@ class Flat {
         this.renderSides = renderSides
 
         this.sides = [
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__shape__["a" /* shape */])([
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([
                 [1, 0, -height],
                 [1, 0, 0],
                 [0, 0, 0],
                 [0, 0, -height]
-            ], this.position), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__shape__["a" /* shape */])([
+            ], this.position), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([
                 [1, 1, -height],
                 [1, 1, 0],
                 [1, 0, 0],
                 [1, 0, -height]
-            ], this.position), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__shape__["a" /* shape */])([
+            ], this.position), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([
                 [1, 1, -height],
                 [1, 1, 0],
                 [0, 1, 0],
                 [0, 1, -height]
-            ], this.position), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__shape__["a" /* shape */])([
+            ], this.position), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([
                 [0, 1, -height],
                 [0, 1, 0],
                 [0, 0, 0],
@@ -1064,7 +1206,7 @@ class Flat {
             ], this.position)
         ]
 
-        this.top = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__shape__["a" /* shape */])([
+        this.top = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([
             [0, 0, -height],
             [1, 0, -height],
             [1, 1, -height],
@@ -1093,13 +1235,13 @@ class Flat {
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shape__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__math_Vec3__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Settings__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Shape__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__math_Vec3__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Settings__ = __webpack_require__(1);
 
 
 
@@ -1113,22 +1255,22 @@ class Slide {
         this.position = new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */](-position[1] * s, -position[0] * s, -position[2])
         this.renderSides = renderSides
         this.sides = [
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__shape__["a" /* shape */])([
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([
                 [1, 0, -height - heights[0]],
                 [1, 0, 0],
                 [0, 0, 0],
                 [0, 0, -height - heights[3]],
-            ], this.position), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__shape__["a" /* shape */])([
+            ], this.position), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([
                 [1, 1, -height - heights[1]],
                 [1, 1, 0],
                 [1, 0, 0],
                 [1, 0, -height - heights[0]],
-            ], this.position), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__shape__["a" /* shape */])([
+            ], this.position), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([
                 [1, 1, -height - heights[1]],
                 [1, 1, 0],
                 [0, 1, 0],
                 [0, 1, -height - heights[2]],
-            ], this.position), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__shape__["a" /* shape */])([
+            ], this.position), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([
                 [0, 1, -height - heights[2]],
                 [0, 1, 0],
                 [0, 0, 0],
@@ -1136,7 +1278,7 @@ class Slide {
             ], this.position)
         ]
 
-        this.top = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__shape__["a" /* shape */])([
+        this.top = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([
             [0, 0, -height - heights[3]],
             [1, 0, -height - heights[0]],
             [1, 1, -height - heights[1]],
@@ -1166,21 +1308,13 @@ class Slide {
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Game__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__shape__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__entities_Player__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Map__ = __webpack_require__(24);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__net_remote__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Resources__ = __webpack_require__(1);
-
-
-
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Game__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Resources__ = __webpack_require__(2);
 
 
 
@@ -1191,113 +1325,58 @@ const game = new __WEBPACK_IMPORTED_MODULE_0__Game__["a" /* default */]({
 })
 game.start()
 
-__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__Resources__["a" /* waitForResources */])().then(() => {
-    game.map = __WEBPACK_IMPORTED_MODULE_5__Resources__["b" /* default */].maps['0102']
+__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__Resources__["a" /* waitForResources */])().then(() => {
+    game.map = __WEBPACK_IMPORTED_MODULE_1__Resources__["b" /* default */].maps['0102']
 })
-
-/***/ }),
-/* 24 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Style__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__objects_Flat__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__objects_Slide__ = __webpack_require__(22);
-
-
-
-
-const position0 = new Float32Array([0, 0, 0])
-
-class Map {
-    constructor(map) {
-
-        this.styleGroups = []
-        this.elements = []
-        let i
-
-        for (let group of map) {
-            let topPoints = [], sidePoints = [], botPoints = []
-            this.styleGroups.push({
-                botPoints, topPoints, sidePoints,
-                style: new __WEBPACK_IMPORTED_MODULE_0__Style__["a" /* default */](group.style)
-            })
-            for (i = 0; i < group.elements.length; i++) {
-                const [type, ...args] = group.elements[i]
-                switch (type.toLowerCase()) {
-                    case 'flat':
-                        var block = new __WEBPACK_IMPORTED_MODULE_1__objects_Flat__["a" /* default */](...args)
-                        break
-                    case 'slide':
-                        var block = new __WEBPACK_IMPORTED_MODULE_2__objects_Slide__["a" /* default */](...args)
-                        break
-                }
-                topPoints.push(...block.top.points)
-                sidePoints.push(...block.sides[1].points)
-                sidePoints.push(...block.sides[2].points)
-                botPoints.push(...block.bottom)
-                this.elements.push(block)
-            }
-        }
-
-        for (i = 0; i < this.styleGroups.length; i++) {
-            this.styleGroups[i].topPoints = new Float32Array(this.styleGroups[i].topPoints)
-            this.styleGroups[i].toplength = this.styleGroups[i].topPoints.length / 3
-            this.styleGroups[i].sidePoints = new Float32Array(this.styleGroups[i].sidePoints)
-            this.styleGroups[i].sidelength = this.styleGroups[i].sidePoints.length / 3
-            this.styleGroups[i].botPoints = new Float32Array(this.styleGroups[i].botPoints)
-            this.styleGroups[i].botlength = this.styleGroups[i].botPoints.length / 3
-        }
-
-    }
-    draw(bp, gl) {
-        for (var i = 0; i < this.styleGroups.length; i++) {
-            bp.position.set(position0)
-            bp.vert.set(this.styleGroups[i].topPoints)
-
-            bp.color.set(this.styleGroups[i].style.top.fill)
-            gl.drawArrays(gl.TRIANGLES, 0, this.styleGroups[i].toplength)
-
-            bp.color.set(this.styleGroups[i].style.top.stroke)
-            gl.drawArrays(gl.LINES, 0, this.styleGroups[i].toplength)
-
-            bp.vert.set(this.styleGroups[i].sidePoints)
-
-            bp.color.set(this.styleGroups[i].style.sides.fill)
-            gl.drawArrays(gl.TRIANGLES, 0, this.styleGroups[i].sidelength)
-
-            bp.color.set(this.styleGroups[i].style.sides.stroke)
-            gl.drawArrays(gl.LINES, 0, this.styleGroups[i].sidelength)
-
-
-            bp.vert.set(this.styleGroups[i].botPoints)
-            gl.drawArrays(gl.LINES, 0, this.styleGroups[i].botlength)
- 
-        }
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Map;
-
 
 /***/ }),
 /* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony default export */ __webpack_exports__["a"] = {
-    pixelFilter: true,
-    pixelResolution: 350, // px
-    frameTime: 30, // ms
-    projectionAngle: 28,
-    keys: {
-        fire: 'space',
-        top: 'W',
-        left: 'A',
-        bottom: 'S',
-        rigth: 'D'
-    },
-    blocksSpacing: 0.06, // %
-};
+class Shape {
+    constructor(points, v) {
+        if (points.length === 3) {
+            this.points = new Float32Array([
+                points[0][0] + v[0], points[0][1] + v[1], points[0][2] + v[2],
+                points[1][0] + v[0], points[1][1] + v[1], points[1][2] + v[2],
+                points[2][0] + v[0], points[2][1] + v[1], points[2][2] + v[2]
+            ])
+        } else {
+            this.points = new Float32Array([
+                points[0][0] + v[0], points[0][1] + v[1], points[0][2] + v[2],
+                points[1][0] + v[0], points[1][1] + v[1], points[1][2] + v[2],
+                points[2][0] + v[0], points[2][1] + v[1], points[2][2] + v[2],
+                points[2][0] + v[0], points[2][1] + v[1], points[2][2] + v[2],
+                points[3][0] + v[0], points[3][1] + v[1], points[3][2] + v[2],
+                points[0][0] + v[0], points[0][1] + v[1], points[0][2] + v[2]
+            ])
+        }
+    }
+
+    draw(bp, style, gl) {
+        bp.vert.set(this.points)
+        bp.color.set(style.fill)
+        gl.drawArrays(4, 0, this.points.length / 3) // TRIANGLES
+
+        bp.color.set(style.stroke)
+        gl.drawArrays(2, 0, this.points.length / 3) // LINE_LOOP
+    }
+    drawChecked(cp, style, gl) {
+        cp.vert.set(this.points)
+        cp.color1.set(style.top.fill)
+        cp.color2.set(style.sides.fill)
+        gl.drawArrays(4, 0, this.points.length / 3) // TRIANGLES
+
+        gl.drawArrays(2, 0, this.points.length / 3) // LINE_LOOP
+    }
+}
+
+const shape = (points, t) => {
+    return new Shape(points, t)
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = shape;
+
 
 /***/ })
 /******/ ]);

@@ -1,8 +1,18 @@
-import { createFragmentShader, createVertexShader } from './Shader'
+import { createShader } from './Shader'
 import Attribute from './Attribute'
 import Uniform from './Uniform'
 
+/** Appends Attributes and Uniforms from source to target.
+ * 
+ * @param {Object} target 
+ * @param {WebGLRenderingContext} gl 
+ * @param {WebGLProgram} program 
+ * @param {String} source
+ */
 const appendAU = (target, gl, program, source) => {
+    
+    gl.useProgram(program)
+
     const regex = /^(attribute|uniform)\s+(\w+)\s+(\w+)\s*;/gm
     let temp
     while (temp = regex.exec(source)) {
@@ -21,25 +31,21 @@ const appendAU = (target, gl, program, source) => {
 
 export default class Program {
 
-    /**
+    /** Creates Program.
      * @param {WebGLRenderingContext} gl
      */
     constructor(gl, ...shaders) {
 
         const program = gl.createProgram()
-        for (let i = 0; i < shaders.length; i++) {
-            if (typeof shaders[i] === 'string') {
-                if (/gl_Position/.test(shaders[i])) // test if source is vertex shader
-                    shaders[i] = createVertexShader(gl, shaders[i])
-                else
-                    shaders[i] = createFragmentShader(gl, shaders[i])
-            }
+
+        for (let i = 0; i < shaders.length; i++) { // creating and attaching shaders
+            if (typeof shaders[i] === 'string')
+                shaders[i] = createShader(gl, shaders[i])
             gl.attachShader(program, shaders[i])
         }
-        gl.linkProgram(program)
 
-        // checking for errors
-        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        gl.linkProgram(program) // linking program
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) { // checking for linking errors
             console.error(`Failed to link program: ${gl.getProgramInfoLog(program)}`)
             gl.deleteProgram(program)
             gl.deleteShader(fragment)
@@ -47,10 +53,9 @@ export default class Program {
             return null
         }
 
-        // checking for errors
-        gl.validateProgram(program)
-        if (!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {
-            console.error(`Failed to link program: ${gl.getProgramInfoLog(program)}`)
+        gl.validateProgram(program) // validating program
+        if (!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {// checking for errors
+            console.error(`Program validation failed: ${gl.getProgramInfoLog(program)}`)
             gl.deleteProgram(program)
             gl.deleteShader(fragment)
             gl.deleteShader(vertex)
@@ -62,7 +67,6 @@ export default class Program {
             else return source + obj.source + '\n'
         }, '')
         // appending atributes and uniforms
-        gl.useProgram(program)
         appendAU(this, gl, program, fullSource)
 
         this.__program__ = program
@@ -70,15 +74,19 @@ export default class Program {
         this.shaders = shaders
     }
 
+    /** Set program as active. */
     use() {
         this.gl.useProgram(this.__program__)
     }
 
+    /** Set all properties of pprogram at once. */
     set(obj) {
         for (let name in obj) {
             this[name].set(obj[name])
         }
     }
+
+    /** Call gl.drawArrays. */
     draw(n, mode = 'POINTS') {
         this.gl.drawArrays(this.gl[mode.toUpperCase()], 0, n)
     }

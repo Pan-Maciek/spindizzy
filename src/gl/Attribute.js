@@ -2,14 +2,14 @@ import { typeSize } from './types.js'
 
 export default class Attribute {
 
-    /**
+    /** Creates attribute.
      * @param {WebGLRenderingContext} gl
      * @param {WebGLProgram} program
      * @param {String} name
      * @param {String} type
      */
     constructor(gl, program, name, type) {
-        
+
         this.gl = gl
         this.name = name
         this.size = typeSize(type)
@@ -19,6 +19,10 @@ export default class Attribute {
 
     }
 
+    /** Sets value of curent attribute and enables it.
+     *  NOTE: Remember to use program.
+     * @param {Float32Array} value 
+     */
     set(value) {
         this.gl.enableVertexAttribArray(this.__location__)
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.__buffer__)

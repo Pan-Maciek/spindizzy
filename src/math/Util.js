@@ -1,14 +1,14 @@
-const _PI180_ = Math.PI / 180
-const _180PI_ = 180 / Math.PI
+const __PI180__ = Math.PI / 180
+const __180PI__ = 180 / Math.PI
 
 /** Convert degrees to radians.
  * @param {Number} deg degrees
  * @returns {Number}
  */
-export const degToRad = deg => deg * _PI180_
+export const degToRad = deg => deg * __PI180__
 
 /** Convert radians to degrees.
  * @param {Number} deg radians
  * @returns {Number}
  */
-export const radToDeg = deg => deg * _180PI_
+export const radToDeg = deg => deg * __180PI__

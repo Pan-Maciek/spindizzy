@@ -5,6 +5,7 @@ import Slide from './objects/Slide'
 const position0 = new Float32Array([0, 0, 0])
 
 export default class Map {
+
     constructor(map) {
 
         this.styleGroups = []
@@ -45,6 +46,7 @@ export default class Map {
         }
 
     }
+
     draw(bp, gl) {
         for (var i = 0; i < this.styleGroups.length; i++) {
             bp.position.set(position0)

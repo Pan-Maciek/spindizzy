@@ -1,6 +1,4 @@
-/** Class representing a 3d vector.
- * @version 0.0.2
- */
+/** Class representing a 3d vector. */
 export default class Vec3 extends Float32Array {
 
     constructor(x = 0, y = 0, z = 0) {

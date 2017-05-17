@@ -1,4 +1,5 @@
-import { drawShape, shape } from '../Shape'
+import { shape } from '../Shape'
+import Plane from '../physics/coliders/Plane'
 import Vec3 from '../math/Vec3'
 import Settings from '../Settings'
 
@@ -6,28 +7,27 @@ const s = 1 + Settings.blocksSpacing
 
 export default class Flat {
 
-    constructor(position, height, renderSides = true) {
+    constructor(position, height) {
 
-        this.position = new Vec3(-position[1] * s, -position[0] * s, -position[2])
-        this.renderSides = renderSides
+        this.position = new Vec3(-position[1], -position[0], -position[2])
 
         this.sides = [
-            shape([
+            shape([ // back left
                 [1, 0, -height],
                 [1, 0, 0],
                 [0, 0, 0],
                 [0, 0, -height]
-            ], this.position), shape([
+            ], this.position), shape([ // fron left
                 [1, 1, -height],
                 [1, 1, 0],
                 [1, 0, 0],
                 [1, 0, -height]
-            ], this.position), shape([
+            ], this.position), shape([ // fron right
                 [1, 1, -height],
                 [1, 1, 0],
                 [0, 1, 0],
                 [0, 1, -height]
-            ], this.position), shape([
+            ], this.position), shape([ // back right
                 [0, 1, -height],
                 [0, 1, 0],
                 [0, 0, 0],
@@ -44,11 +44,17 @@ export default class Flat {
 
         const [x, y, z] = this.position
         this.bottom = [
-            x, y + 1, z,
-            x + 1, y + 1, z,
-            x + 1, y + 1, z,
-            x + 1, y, z
+            x * s, (y + 1) * s, z,
+            (x + 1) * s, (y + 1) * s, z,
+            (x + 1) * s, (y + 1) * s, z,
+            (x + 1) * s, y * s, z
         ]
+
+        this.topPlane = new Plane(
+            new Vec3(0, 0, -height - this.position[2]),
+            new Vec3(1, 0, -height - this.position[2]),
+            new Vec3(1, 1, -height - this.position[2])
+        )
     }
 
     draw(bp, gl) {

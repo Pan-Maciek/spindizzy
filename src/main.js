@@ -6,8 +6,8 @@ const game = new Game({
     appendTo: document.getElementById('game'),
     control: window
 })
-game.start()
 
 waitForResources().then(() => {
-    game.map = Resources.maps['0102']
+    game.map = Resources.maps['0000']
+    game.start()
 })

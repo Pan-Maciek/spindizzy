@@ -1,4 +1,5 @@
 import { drawShape, shape } from '../Shape'
+import Plane from '../physics/coliders/Plane'
 import Vec3 from '../math/Vec3'
 import Settings from '../Settings'
 
@@ -6,10 +7,10 @@ const s = 1 + Settings.blocksSpacing
 
 export default class Slide {
 
-    constructor(position, height, heights, renderSides = true) {
+    constructor(position, height, heights) {
 
-        this.position = new Vec3(-position[1] * s, -position[0] * s, -position[2])
-        this.renderSides = renderSides
+        this.position = new Vec3(-position[1], -position[0], -position[2])
+
         this.sides = [
             shape([
                 [1, 0, -height - heights[0]],
@@ -43,19 +44,17 @@ export default class Slide {
 
         const [x, y, z] = this.position
         this.bottom = [
-            x, y + 1, z,
-            x + 1, y + 1, z,
-            x + 1, y + 1, z,
-            x + 1, y, z
+            (x - .5) * s, (y + .5) * s, z,
+            (x + .5) * s, (y + .5) * s, z,
+            (x + .5) * s, (y + .5) * s, z,
+            (x + .5) * s, (y - .5) * s, z
         ]
-    }
 
-    draw(bp, gl) {
-        bp.position.set(this.position)
 
-        this.top.draw(bp, this.style.top, gl)
-
-        this.sides[1].draw(bp, this.style.sides, gl)
-        this.sides[2].draw(bp, this.style.sides, gl)
+        this.topPlane = new Plane(
+            new Vec3(0 + this.position[0] - .5, 0 + this.position[1] - .5, -height - heights[3] + this.position[2]),
+            new Vec3(1 + this.position[0] - .5, 0 + this.position[1] - .5, -height - heights[0] + this.position[2]),
+            new Vec3(1 + this.position[0] - .5, 1 + this.position[1] - .5, -height - heights[1] + this.position[2])
+        )
     }
 }

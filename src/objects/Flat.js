@@ -44,25 +44,16 @@ export default class Flat {
 
         const [x, y, z] = this.position
         this.bottom = [
-            x * s, (y + 1) * s, z,
-            (x + 1) * s, (y + 1) * s, z,
-            (x + 1) * s, (y + 1) * s, z,
-            (x + 1) * s, y * s, z
+            (x - .5) * s, (y + .5) * s, z,
+            (x + .5) * s, (y + .5) * s, z,
+            (x + .5) * s, (y + .5) * s, z,
+            (x + .5) * s, (y - .5) * s, z
         ]
 
         this.topPlane = new Plane(
-            new Vec3(0, 0, -height - this.position[2]),
-            new Vec3(1, 0, -height - this.position[2]),
-            new Vec3(1, 1, -height - this.position[2])
+            new Vec3(0, 0, -height + this.position[2]),
+            new Vec3(1, 0, -height + this.position[2]),
+            new Vec3(1, 1, -height + this.position[2])
         )
-    }
-
-    draw(bp, gl) {
-        bp.position.set(this.position)
-
-        this.sides[1].draw(bp, this.style.sides, gl)
-        this.sides[2].draw(bp, this.style.sides, gl)
-
-        this.top.draw(bp, this.style.top, gl)
     }
 }

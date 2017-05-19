@@ -1,6 +1,7 @@
 import Style from './Style'
 import Flat from './objects/Flat'
 import Slide from './objects/Slide'
+import Arrow from './objects/Arrow'
 
 const position0 = new Float32Array([0, 0, 0])
 
@@ -10,15 +11,13 @@ export default class Map {
 
         this.styleGroups = []
         this.elements = []
-        let i
+        this.selfDrawn = []
 
         for (let group of map) {
             let topPoints = [], sidePoints = [], botPoints = []
-            this.styleGroups.push({
-                botPoints, topPoints, sidePoints,
-                style: new Style(group.style)
-            })
-            for (i = 0; i < group.elements.length; i++) {
+            const style = new Style(group.style)
+            this.styleGroups.push({ botPoints, topPoints, sidePoints, style })
+            for (var i = 0; i < group.elements.length; i++) {
                 const [type, ...args] = group.elements[i]
                 switch (type.toLowerCase()) {
                     case 'flat':
@@ -27,16 +26,23 @@ export default class Map {
                     case 'slide':
                         var block = new Slide(...args)
                         break
+                    case 'arrow':
+                        var block = new Arrow(...args)
+                        block.style = style
+                        this.selfDrawn.push(block)
+                        continue
                 }
                 topPoints.push(...block.top.points)
                 sidePoints.push(...block.sides[1].points)
                 sidePoints.push(...block.sides[2].points)
+                sidePoints.push(...block.sides[3].points)
+                sidePoints.push(...block.sides[0].points)
                 botPoints.push(...block.bottom)
                 this.elements.push(block)
             }
         }
 
-        for (i = 0; i < this.styleGroups.length; i++) {
+        for (var i = 0; i < this.styleGroups.length; i++) {
             this.styleGroups[i].topPoints = new Float32Array(this.styleGroups[i].topPoints)
             this.styleGroups[i].toplength = this.styleGroups[i].topPoints.length / 3
             this.styleGroups[i].sidePoints = new Float32Array(this.styleGroups[i].sidePoints)
@@ -44,7 +50,6 @@ export default class Map {
             this.styleGroups[i].botPoints = new Float32Array(this.styleGroups[i].botPoints)
             this.styleGroups[i].botlength = this.styleGroups[i].botPoints.length / 3
         }
-
     }
 
     draw(bp, gl) {
@@ -66,10 +71,12 @@ export default class Map {
             bp.color.set(this.styleGroups[i].style.sides.stroke)
             gl.drawArrays(gl.LINES, 0, this.styleGroups[i].sidelength)
 
-
             bp.vert.set(this.styleGroups[i].botPoints)
             gl.drawArrays(gl.LINES, 0, this.styleGroups[i].botlength)
- 
+
+        }
+        for (var i = 0; i < this.selfDrawn.length; i++) {
+            this.selfDrawn[i].draw(bp, gl)
         }
     }
 }

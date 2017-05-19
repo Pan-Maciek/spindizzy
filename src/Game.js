@@ -16,7 +16,7 @@ const projectionMatrix = new Mat4(
     -sin, -sin, -1, 0,
     0, 0, 1, 0,
     0, 0, 0, 1
-).zoom(0.1)
+).zoom(Settings.zoom / 10)
 
 var meter = new FPSMeter()
 
@@ -41,7 +41,11 @@ export default function Game({
 
     // creating programs
     const bp = BasicProgram(gl) // basicProgram
-    const pp = new PixelProgram(gl, canvas) // PixelizeProgram
+
+    if (Settings.pixelFilter) {
+        var pp = new PixelProgram(gl, canvas) // PixelizeProgram
+    }
+
     bp.use()
     bp.projection.set(projectionMatrix)
 
@@ -80,28 +84,49 @@ export default function Game({
 
     let w = canvas.width = appendTo.clientWidth
     let h = canvas.height = appendTo.clientHeight
+    gl.viewport(0, 0, w, h)
+    window.addEventListener('resize', () => {
+        if (appendTo.height !== canvas.height) {
+            w = canvas.width = appendTo.clientWidth
+            h = canvas.height = appendTo.clientHeight
+            gl.viewport(0, 0, w, h)
+        }
+    })
 
     let i = 0, length
     this.map = null
 
-    this.player = new Player([0, 0, 0])
+    this.player = new Player([-3, 0, 7])
     gl.clearColor(64 / 255, 21 / 255, 207 / 255, 1)
-
+    
     const update = () => {
-
+        this.player.force[0] = move[0]
+        this.player.force[1] = move[1]
+        this.player.update(this.map || [{ elements: [] }])
     }
 
-    const draw = () => {
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+    if (Settings.pixelFilter) {
+        var draw = () => {
+            pp.begin()
+            bp.use()
 
-        pp.begin()
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-        bp.use()
-        if (this.map)
-            this.map.draw(bp, gl)
+            if (this.map) this.map.draw(bp, gl)
 
-        this.player.draw(bp, gl)
-        pp.end()
+            this.player.draw(bp, gl)
+            
+            pp.end()
+        }
+    } else {
+        var draw = () => {
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
+            if (this.map) this.map.draw(bp, gl)
+
+            this.player.draw(bp, gl)
+            
+        }
     }
 
     // varibles for gameLoop - prevent gc, sabelize performance

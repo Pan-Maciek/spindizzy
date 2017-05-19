@@ -82,10 +82,6 @@ export default class Vec3 extends Float32Array {
         return Math.hypot(this[0], this[1], this[2])
     }
 
-    toFloat32Array() {
-        return new Float32Array([this[0], this[1], this[2]])
-    }
-
     normalize(out = this) {
         const length = this.length
         out[0] = this[0] / length

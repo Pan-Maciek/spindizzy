@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 24);
+/******/ 	return __webpack_require__(__webpack_require__.s = 27);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -71,58 +71,25 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-class Shape {
-    constructor(points, v) {
-        if (points.length === 3) {
-            this.points = new Float32Array([
-                points[0][0] + v[0], points[0][1] + v[1], points[0][2] + v[2],
-                points[1][0] + v[0], points[1][1] + v[1], points[1][2] + v[2],
-                points[2][0] + v[0], points[2][1] + v[1], points[2][2] + v[2]
-            ])
-        } else {
-            this.points = new Float32Array([
-                points[0][0] + v[0], points[0][1] + v[1], points[0][2] + v[2],
-                points[1][0] + v[0], points[1][1] + v[1], points[1][2] + v[2],
-                points[2][0] + v[0], points[2][1] + v[1], points[2][2] + v[2],
-                points[2][0] + v[0], points[2][1] + v[1], points[2][2] + v[2],
-                points[3][0] + v[0], points[3][1] + v[1], points[3][2] + v[2],
-                points[0][0] + v[0], points[0][1] + v[1], points[0][2] + v[2]
-            ])
-        }
-    }
-
-    draw(bp, style, gl) {
-        bp.vert.set(this.points)
-        bp.color.set(style.fill)
-        gl.drawArrays(4, 0, this.points.length / 3) // TRIANGLES
-
-        bp.color.set(style.stroke)
-        gl.drawArrays(2, 0, this.points.length / 3) // LINE_LOOP
-    }
-    drawChecked(cp, style, gl) {
-        cp.vert.set(this.points)
-        cp.color1.set(style.top.fill)
-        cp.color2.set(style.sides.fill)
-        gl.drawArrays(4, 0, this.points.length / 3) // TRIANGLES
-
-        gl.drawArrays(2, 0, this.points.length / 3) // LINE_LOOP
-    }
-}
-
-const shape = (points, t) => {
-    return new Shape(points, t)
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = shape;
+// export default {
+//     pixelFilter: true,
+//     pixelResolution: 340, // px
+//     frameTime: 30, // ms
+//     projectionAngle: 28,
+//     keys: {
+//         fire: 'space',
+//         top: 'W',
+//         left: 'A',
+//         bottom: 'S',
+//         rigth: 'D'
+//     },
+//     blocksSpacing: 0.06, // %
+//     zoom: 1
+// }
 
 
-/***/ }),
-/* 1 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 /* harmony default export */ __webpack_exports__["a"] = {
-    pixelFilter: true,
-    pixelResolution: 350, // px
+    pixelFilter: false,
     frameTime: 30, // ms
     projectionAngle: 28,
     keys: {
@@ -132,48 +99,27 @@ const shape = (points, t) => {
         bottom: 'S',
         rigth: 'D'
     },
-    blocksSpacing: 0.06, // %
+    blocksSpacing: 0.02, // %
+    zoom: 1
 };
 
-/***/ }),
-/* 2 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__net_remote__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Map__ = __webpack_require__(4);
-
-
-
-const __PRIMISSES__ = []
-const load = (resourceName, url, appendTo = __RESOURCES__.maps) => {
-    const prom = __WEBPACK_IMPORTED_MODULE_0__net_remote__["a" /* default */].json({ url })
-    __PRIMISSES__.push(prom.then(json => {
-        appendTo[resourceName] = new __WEBPACK_IMPORTED_MODULE_1__Map__["a" /* default */](json)
-    }))
-    return prom
-}
-
-const __RESOURCES__ = {
-    maps: {}
-}
-
-load('0000', `${location.href}/maps/map0000.json`)
-load('0100', `${location.href}/maps/map0100.json`)
-load('0001', `${location.href}/maps/map0001.json`)
-load('0002', `${location.href}/maps/map0002.json`)
-load('0010', `${location.href}/maps/map0010.json`)
-load('0020', `${location.href}/maps/map0020.json`)
-load('0102', `${location.href}/maps/map0102.json`)
-
-const waitForResources = () => Promise.all(__PRIMISSES__)
-/* harmony export (immutable) */ __webpack_exports__["a"] = waitForResources;
-
-
-/* harmony default export */ __webpack_exports__["b"] = __RESOURCES__;
+// export default {
+//     pixelFilter: false,
+//     frameTime: 30, // ms
+//     projectionAngle: 28,
+//     keys: {
+//         fire: 'space',
+//         top: 'W',
+//         left: 'A',
+//         bottom: 'S',
+//         rigth: 'D'
+//     },
+//     blocksSpacing: .2, // %
+//     zoom: 1
+// }
 
 /***/ }),
-/* 3 */
+/* 1 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -261,10 +207,6 @@ class Vec3 extends Float32Array {
         return Math.hypot(this[0], this[1], this[2])
     }
 
-    toFloat32Array() {
-        return new Float32Array([this[0], this[1], this[2]])
-    }
-
     normalize(out = this) {
         const length = this.length
         out[0] = this[0] / length
@@ -290,205 +232,84 @@ class Vec3 extends Float32Array {
 
 
 /***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__net_remote__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Map__ = __webpack_require__(13);
+
+
+
+const __PRIMISSES__ = []
+const load = (resourceName, url, appendTo = __RESOURCES__.maps) => {
+    const prom = __WEBPACK_IMPORTED_MODULE_0__net_remote__["a" /* default */].json({ url })
+    __PRIMISSES__.push(prom.then(json => {
+        appendTo[resourceName] = new __WEBPACK_IMPORTED_MODULE_1__Map__["a" /* default */](json)
+    }))
+    return prom
+}
+
+const __RESOURCES__ = {
+    maps: {}
+}
+
+load('0000', `${location.href}/resources/maps/map0000.json`)
+load('0100', `${location.href}/resources/maps/map0100.json`)
+load('0001', `${location.href}/resources/maps/map0001.json`)
+load('0002', `${location.href}/resources/maps/map0002.json`)
+load('0010', `${location.href}/resources/maps/map0010.json`)
+load('0020', `${location.href}/resources/maps/map0020.json`)
+load('0102', `${location.href}/resources/maps/map0102.json`)
+load('testmap', `${location.href}/resources/maps/testmap.json`)
+
+const waitForResources = () => Promise.all(__PRIMISSES__)
+/* harmony export (immutable) */ __webpack_exports__["a"] = waitForResources;
+
+
+/* harmony default export */ __webpack_exports__["b"] = __RESOURCES__;
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Settings__ = __webpack_require__(0);
+
+
+const s = 1 + __WEBPACK_IMPORTED_MODULE_0__Settings__["a" /* default */].blocksSpacing
+
+class Shape {
+    constructor(points, v) {
+        if (!v) v = [0, 0, 0]
+        else v = [v[0] - .5, v[1] - .5, v[2]]
+        if (points.length === 3) {
+            this.points = new Float32Array([
+                points[0][0] + v[0] * s, points[0][1] + v[1] * s, points[0][2] + v[2],
+                points[1][0] + v[0] * s, points[1][1] + v[1] * s, points[1][2] + v[2],
+                points[2][0] + v[0] * s, points[2][1] + v[1] * s, points[2][2] + v[2]
+            ])
+        } else {
+            this.points = new Float32Array([
+                points[0][0] + v[0] * s, points[0][1] + v[1] * s, points[0][2] + v[2],
+                points[1][0] + v[0] * s, points[1][1] + v[1] * s, points[1][2] + v[2],
+                points[2][0] + v[0] * s, points[2][1] + v[1] * s, points[2][2] + v[2],
+                points[2][0] + v[0] * s, points[2][1] + v[1] * s, points[2][2] + v[2],
+                points[3][0] + v[0] * s, points[3][1] + v[1] * s, points[3][2] + v[2],
+                points[0][0] + v[0] * s, points[0][1] + v[1] * s, points[0][2] + v[2]
+            ])
+        }
+    }
+}
+/* unused harmony export default */
+
+
+const shape = (points, t) => new Shape(points, t)
+/* harmony export (immutable) */ __webpack_exports__["a"] = shape;
+
+
+/***/ }),
 /* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Style__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__objects_Flat__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__objects_Slide__ = __webpack_require__(23);
-
-
-
-
-const position0 = new Float32Array([0, 0, 0])
-
-class Map {
-
-    constructor(map) {
-
-        this.styleGroups = []
-        this.elements = []
-        let i
-
-        for (let group of map) {
-            let topPoints = [], sidePoints = [], botPoints = []
-            this.styleGroups.push({
-                botPoints, topPoints, sidePoints,
-                style: new __WEBPACK_IMPORTED_MODULE_0__Style__["a" /* default */](group.style)
-            })
-            for (i = 0; i < group.elements.length; i++) {
-                const [type, ...args] = group.elements[i]
-                switch (type.toLowerCase()) {
-                    case 'flat':
-                        var block = new __WEBPACK_IMPORTED_MODULE_1__objects_Flat__["a" /* default */](...args)
-                        break
-                    case 'slide':
-                        var block = new __WEBPACK_IMPORTED_MODULE_2__objects_Slide__["a" /* default */](...args)
-                        break
-                }
-                topPoints.push(...block.top.points)
-                sidePoints.push(...block.sides[1].points)
-                sidePoints.push(...block.sides[2].points)
-                botPoints.push(...block.bottom)
-                this.elements.push(block)
-            }
-        }
-
-        for (i = 0; i < this.styleGroups.length; i++) {
-            this.styleGroups[i].topPoints = new Float32Array(this.styleGroups[i].topPoints)
-            this.styleGroups[i].toplength = this.styleGroups[i].topPoints.length / 3
-            this.styleGroups[i].sidePoints = new Float32Array(this.styleGroups[i].sidePoints)
-            this.styleGroups[i].sidelength = this.styleGroups[i].sidePoints.length / 3
-            this.styleGroups[i].botPoints = new Float32Array(this.styleGroups[i].botPoints)
-            this.styleGroups[i].botlength = this.styleGroups[i].botPoints.length / 3
-        }
-
-    }
-
-    draw(bp, gl) {
-        for (var i = 0; i < this.styleGroups.length; i++) {
-            bp.position.set(position0)
-            bp.vert.set(this.styleGroups[i].topPoints)
-
-            bp.color.set(this.styleGroups[i].style.top.fill)
-            gl.drawArrays(gl.TRIANGLES, 0, this.styleGroups[i].toplength)
-
-            bp.color.set(this.styleGroups[i].style.top.stroke)
-            gl.drawArrays(gl.LINES, 0, this.styleGroups[i].toplength)
-
-            bp.vert.set(this.styleGroups[i].sidePoints)
-
-            bp.color.set(this.styleGroups[i].style.sides.fill)
-            gl.drawArrays(gl.TRIANGLES, 0, this.styleGroups[i].sidelength)
-
-            bp.color.set(this.styleGroups[i].style.sides.stroke)
-            gl.drawArrays(gl.LINES, 0, this.styleGroups[i].sidelength)
-
-
-            bp.vert.set(this.styleGroups[i].botPoints)
-            gl.drawArrays(gl.LINES, 0, this.styleGroups[i].botlength)
- 
-        }
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Map;
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shape__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__math_Vec3__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Style__ = __webpack_require__(7);
-
-
-
-
-class Player {
-    constructor(position) {
-        this.position = new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */](0, 0, -.5)
-
-        this.top = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__shape__["a" /* shape */])([
-            [0, 0, -.8],
-            [.6, 0, -.8],
-            [.6, .6, -.8],
-            [0, .6, -.8]
-        ], this.position)
-
-        this.sides = [
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__shape__["a" /* shape */])([[.6, 0, -.8],
-            [.3, .3, 0],
-            [0, 0, -.8]], this.position),
-
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__shape__["a" /* shape */])([[.6, .6, -.8],
-            [.3, .3, 0],
-            [.6, 0, -.8]], this.position),
-
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__shape__["a" /* shape */])([[0, .6, -.8],
-            [.3, .3, 0],
-            [.6, .6, -.8]], this.position),
-
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__shape__["a" /* shape */])([[0, 0, -.8],
-            [.3, .3, 0],
-            [0, .6, -.8]], this.position)
-        ]
-
-        this.style = new __WEBPACK_IMPORTED_MODULE_2__Style__["a" /* default */]({
-            top: {
-                fill: [255, 0, 0],
-                stroke: [255, 255, 255]
-            },
-            sides: {
-                fill: [0, 255, 0],
-                stroke: [255, 255, 255]
-            }
-        })
-    }
-    draw(bp, gl) {
-        bp.position.set(this.position)
-        this.top.draw(bp, this.style.top, gl)
-        this.sides[0].draw(bp, this.style.sides, gl)
-        this.sides[1].draw(bp, this.style.sides, gl)
-        this.sides[2].draw(bp, this.style.sides, gl)
-        this.sides[3].draw(bp, this.style.sides, gl)
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Player;
-
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-const postData = object => {
-    if (!object) return null
-    let data = ''
-    for (var key in object)
-        data += `&${encodeURIComponent(key)}=${encodeURIComponent(object[key])}`
-    return data.substring(1)
-}
-
-/** Request data from server.
- * 
- * @param {{url:String, data, method: String}} options
- * @returns {Promise}
- */
-const req = (options) => {
-    return new Promise((resolve, reject) => {
-        const xmlHttp = new XMLHttpRequest()
-        xmlHttp.onreadystatechange = () => {
-            if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
-                resolve(xmlHttp.responseText)
-        }
-        xmlHttp.open(options.method || 'GET', options.url, true)
-        xmlHttp.send(postData(options.data))
-    })
-}
-
-/* harmony default export */ __webpack_exports__["a"] = {
-
-    /** Get data using axaj.
-     * 
-     * @param {{url:String, data, method: String}} options
-     * @returns {Promise}
-     */
-    get(options) { return req(options) },
-
-    /** Get data  using axaj and parser it using JSON.parse().
-     * 
-     * @param {{url:String, data, method: String}} options
-     * @returns {Promise}
-     */
-    json(options) { return req(options).then(data => JSON.parse(data)) }
-};
-
-/***/ }),
-/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -517,7 +338,7 @@ class Style {
 
 
 /***/ }),
-/* 8 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -621,7 +442,7 @@ class Program {
 
 
 /***/ }),
-/* 9 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -639,16 +460,54 @@ const typeSize = type => __SIZE__[type]
 
 
 /***/ }),
-/* 10 */
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__math_Vec3__ = __webpack_require__(1);
+
+
+class Plane {
+
+    /**
+     * NOTE: Points musnt be colinear!
+     *
+     * @param {Vec3} A point at plane
+     * @param {Vec3} B point at plane
+     * @param {Vec3} C point at plane
+     */
+    constructor(A, B, C) {
+
+        const v1 = __WEBPACK_IMPORTED_MODULE_0__math_Vec3__["a" /* default */].sub(B, A)
+        const v2 = __WEBPACK_IMPORTED_MODULE_0__math_Vec3__["a" /* default */].sub(C, A)
+
+        this.norm = v1.corss(v2).normalize()
+        
+        this.p = A
+
+    }
+
+    intersect(sphere) {
+        const v = __WEBPACK_IMPORTED_MODULE_0__math_Vec3__["a" /* default */].sub(sphere.p, this.p)
+        const distance = this.norm.dot(v) - sphere.r
+        return [Math.abs(distance), Math.sign(distance)]
+    }
+
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Plane;
+
+
+/***/ }),
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__math_Mat4__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__math_Util__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__entities_Player__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__entities_Player__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__gl_programs_basic_Program__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__gl_programs_pixelize_Program__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Settings__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Settings__ = __webpack_require__(0);
 /* harmony export (immutable) */ __webpack_exports__["a"] = Game;
 
 
@@ -668,7 +527,7 @@ const projectionMatrix = new __WEBPACK_IMPORTED_MODULE_0__math_Mat4__["a" /* def
     -sin, -sin, -1, 0,
     0, 0, 1, 0,
     0, 0, 0, 1
-).zoom(0.1)
+).zoom(__WEBPACK_IMPORTED_MODULE_5__Settings__["a" /* default */].zoom / 10)
 
 var meter = new FPSMeter()
 
@@ -693,7 +552,11 @@ function Game({
 
     // creating programs
     const bp = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__gl_programs_basic_Program__["a" /* default */])(gl) // basicProgram
-    const pp = new __WEBPACK_IMPORTED_MODULE_4__gl_programs_pixelize_Program__["a" /* default */](gl, canvas) // PixelizeProgram
+
+    if (__WEBPACK_IMPORTED_MODULE_5__Settings__["a" /* default */].pixelFilter) {
+        var pp = new __WEBPACK_IMPORTED_MODULE_4__gl_programs_pixelize_Program__["a" /* default */](gl, canvas) // PixelizeProgram
+    }
+
     bp.use()
     bp.projection.set(projectionMatrix)
 
@@ -732,28 +595,49 @@ function Game({
 
     let w = canvas.width = appendTo.clientWidth
     let h = canvas.height = appendTo.clientHeight
+    gl.viewport(0, 0, w, h)
+    window.addEventListener('resize', () => {
+        if (appendTo.height !== canvas.height) {
+            w = canvas.width = appendTo.clientWidth
+            h = canvas.height = appendTo.clientHeight
+            gl.viewport(0, 0, w, h)
+        }
+    })
 
     let i = 0, length
     this.map = null
 
-    this.player = new __WEBPACK_IMPORTED_MODULE_2__entities_Player__["a" /* default */]([0, 0, 0])
+    this.player = new __WEBPACK_IMPORTED_MODULE_2__entities_Player__["a" /* default */]([-3, 0, 7])
     gl.clearColor(64 / 255, 21 / 255, 207 / 255, 1)
-
+    
     const update = () => {
-
+        this.player.force[0] = move[0]
+        this.player.force[1] = move[1]
+        this.player.update(this.map || [{ elements: [] }])
     }
 
-    const draw = () => {
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+    if (__WEBPACK_IMPORTED_MODULE_5__Settings__["a" /* default */].pixelFilter) {
+        var draw = () => {
+            pp.begin()
+            bp.use()
 
-        pp.begin()
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-        bp.use()
-        if (this.map)
-            this.map.draw(bp, gl)
+            if (this.map) this.map.draw(bp, gl)
 
-        this.player.draw(bp, gl)
-        pp.end()
+            this.player.draw(bp, gl)
+            
+            pp.end()
+        }
+    } else {
+        var draw = () => {
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
+            if (this.map) this.map.draw(bp, gl)
+
+            this.player.draw(bp, gl)
+            
+        }
     }
 
     // varibles for gameLoop - prevent gc, sabelize performance
@@ -793,35 +677,245 @@ function Game({
 }
 
 /***/ }),
-/* 11 */
+/* 9 */
 /***/ (function(module, exports) {
 
 module.exports = "precision lowp float;\r\n\r\nuniform vec3 color;\r\n\r\nvoid main() {\r\n    gl_FragColor = vec4(color, 1);\r\n}"
 
 /***/ }),
-/* 12 */
+/* 10 */
 /***/ (function(module, exports) {
 
 module.exports = "precision lowp float;\r\n\r\nattribute vec3 vert;\r\n\r\nuniform vec3 position;\r\nuniform mat4 projection;\r\n\r\nvoid main() {\r\n    gl_Position = projection * vec4(vert + position, 1);\r\n}"
 
 /***/ }),
-/* 13 */
+/* 11 */
 /***/ (function(module, exports) {
 
 module.exports = "precision lowp float;\r\n\r\nvarying vec2 v_texcoord;\r\n\r\nuniform sampler2D texture;\r\n\r\nvoid main() {\r\n  gl_FragColor = texture2D(texture, v_texcoord);\r\n}"
 
 /***/ }),
-/* 14 */
+/* 12 */
 /***/ (function(module, exports) {
 
 module.exports = "precision lowp float;\r\n\r\nattribute vec2 position;\r\nattribute vec2 texcoord;\r\n\r\nvarying vec2 v_texcoord;\r\n\r\nvoid main() {\r\n   gl_Position = vec4(position, 0, 1);\r\n   v_texcoord = texcoord;\r\n}"
+
+/***/ }),
+/* 13 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Style__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__objects_Flat__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__objects_Slide__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__objects_Arrow__ = __webpack_require__(23);
+
+
+
+
+
+const position0 = new Float32Array([0, 0, 0])
+
+class Map {
+
+    constructor(map) {
+
+        this.styleGroups = []
+        this.elements = []
+        this.selfDrawn = []
+
+        for (let group of map) {
+            let topPoints = [], sidePoints = [], botPoints = []
+            const style = new __WEBPACK_IMPORTED_MODULE_0__Style__["a" /* default */](group.style)
+            this.styleGroups.push({ botPoints, topPoints, sidePoints, style })
+            for (var i = 0; i < group.elements.length; i++) {
+                const [type, ...args] = group.elements[i]
+                switch (type.toLowerCase()) {
+                    case 'flat':
+                        var block = new __WEBPACK_IMPORTED_MODULE_1__objects_Flat__["a" /* default */](...args)
+                        break
+                    case 'slide':
+                        var block = new __WEBPACK_IMPORTED_MODULE_2__objects_Slide__["a" /* default */](...args)
+                        break
+                    case 'arrow':
+                        var block = new __WEBPACK_IMPORTED_MODULE_3__objects_Arrow__["a" /* default */](...args)
+                        block.style = style
+                        this.selfDrawn.push(block)
+                        continue
+                }
+                topPoints.push(...block.top.points)
+                sidePoints.push(...block.sides[1].points)
+                sidePoints.push(...block.sides[2].points)
+                sidePoints.push(...block.sides[3].points)
+                sidePoints.push(...block.sides[0].points)
+                botPoints.push(...block.bottom)
+                this.elements.push(block)
+            }
+        }
+
+        for (var i = 0; i < this.styleGroups.length; i++) {
+            this.styleGroups[i].topPoints = new Float32Array(this.styleGroups[i].topPoints)
+            this.styleGroups[i].toplength = this.styleGroups[i].topPoints.length / 3
+            this.styleGroups[i].sidePoints = new Float32Array(this.styleGroups[i].sidePoints)
+            this.styleGroups[i].sidelength = this.styleGroups[i].sidePoints.length / 3
+            this.styleGroups[i].botPoints = new Float32Array(this.styleGroups[i].botPoints)
+            this.styleGroups[i].botlength = this.styleGroups[i].botPoints.length / 3
+        }
+    }
+
+    draw(bp, gl) {
+        for (var i = 0; i < this.styleGroups.length; i++) {
+            bp.position.set(position0)
+            bp.vert.set(this.styleGroups[i].topPoints)
+
+            bp.color.set(this.styleGroups[i].style.top.fill)
+            gl.drawArrays(gl.TRIANGLES, 0, this.styleGroups[i].toplength)
+
+            bp.color.set(this.styleGroups[i].style.top.stroke)
+            gl.drawArrays(gl.LINES, 0, this.styleGroups[i].toplength)
+
+            bp.vert.set(this.styleGroups[i].sidePoints)
+
+            bp.color.set(this.styleGroups[i].style.sides.fill)
+            gl.drawArrays(gl.TRIANGLES, 0, this.styleGroups[i].sidelength)
+
+            bp.color.set(this.styleGroups[i].style.sides.stroke)
+            gl.drawArrays(gl.LINES, 0, this.styleGroups[i].sidelength)
+
+            bp.vert.set(this.styleGroups[i].botPoints)
+            gl.drawArrays(gl.LINES, 0, this.styleGroups[i].botlength)
+
+        }
+        for (var i = 0; i < this.selfDrawn.length; i++) {
+            this.selfDrawn[i].draw(bp, gl)
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Map;
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Shape__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__math_Vec3__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Style__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__physics_coliders_Sphere__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Settings__ = __webpack_require__(0);
+
+
+
+
+
+
+const s = 1 + __WEBPACK_IMPORTED_MODULE_4__Settings__["a" /* default */].blocksSpacing
+
+class Player {
+    constructor(position) {
+        this.sphere = new __WEBPACK_IMPORTED_MODULE_3__physics_coliders_Sphere__["a" /* default */](new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */](-position[1], -position[0], -position[2]), .8)
+
+        this.top = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([
+            [-.3, -.3, -1.6],
+            [.3, -.3, -1.6],
+            [.3, .3, -1.6],
+            [-.3, .3, -1.6]
+        ])
+
+        this.sides = [
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([[.3, -.3, -1.6],
+            [0, 0, -.8],
+            [-.3, -.3, -1.6]]),
+
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([[.3, .3, -1.6],
+            [0, 0, -.8],
+            [.3, -.3, -1.6]]),
+
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([[-.3, .3, -1.6],
+            [0, 0, -.8],
+            [.3, .3, -1.6]]),
+
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([[-.3, -.3, -1.6],
+            [0, 0, -.8],
+            [-.3, .3, -1.6]])
+        ]
+
+        this.style = new __WEBPACK_IMPORTED_MODULE_2__Style__["a" /* default */]({
+            top: {
+                fill: [255, 255, 255],
+                stroke: [140, 8, 75]
+            },
+            sides: {
+                fill: [64, 21, 207],
+                stroke: [140, 8, 75]
+            }
+        })
+        this.force = new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */](0, 0, 0)
+        this.t = 0
+    }
+    draw(bp, gl) {
+        const pos = new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */](this.sphere.p[0] * s, this.sphere.p[1] * s, this.sphere.p[2])
+        bp.position.set(pos)
+
+        // var t = this.t -= 0.1
+        // var topPoints = []
+        // topPoints.push([Math.cos(t) * 0.4, Math.sin(t) * 0.4, -1.6])
+        // t += Math.PI / 2
+        // topPoints.push([Math.cos(t) * 0.4, Math.sin(t) * 0.4, -1.6])
+        // t += Math.PI / 2
+        // topPoints.push([Math.cos(t) * 0.4, Math.sin(t) * 0.4, -1.6])
+        // t += Math.PI / 2
+        // topPoints.push([Math.cos(t) * 0.4, Math.sin(t) * 0.4, -1.6])
+
+        // this.top = shape(topPoints)
+
+        bp.vert.set(this.top.points)
+        bp.color.set(this.style.top.fill)
+        gl.drawArrays(gl.TRIANGLES, 0, this.top.points.length / 3)
+        bp.color.set(this.style.top.stroke)
+        gl.drawArrays(gl.LINE_LOOP, 0, this.top.points.length / 3)
+
+        for (let i = 0; i < 4; i++) {
+            bp.vert.set(this.sides[i].points)
+            bp.color.set(this.style.sides.fill)
+            gl.drawArrays(gl.TRIANGLES, 0, this.sides[i].points.length / 3)
+            bp.color.set(this.style.sides.stroke)
+            gl.drawArrays(gl.LINE_LOOP, 0, this.sides[i].points.length / 3)
+        }
+    }
+    update(blocks) {
+        this.sphere.p.add(new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */](0, 0, .1))
+        this.sphere.p.add(this.force)
+
+        x.innerText = ''
+        for (var i = 0; i < blocks.elements.length; i++) {
+
+            if (Math.abs(blocks.elements[i].position[0] - this.sphere.p[0]) > .5) continue
+            if (Math.abs(blocks.elements[i].position[1] - this.sphere.p[1]) > .5) continue
+
+            var data = blocks.elements[i].topPlane.intersect(this.sphere)
+
+            if (data[1] > 0 && data[0] < this.sphere.r) {
+                let v = (__WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */].scale(blocks.elements[i].topPlane.norm, -data[0]))
+
+                x.innerText = v
+                this.sphere.p.add(v)
+                break
+            }
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Player;
+
+
 
 /***/ }),
 /* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__types_js__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__types_js__ = __webpack_require__(6);
 
 
 class Attribute {
@@ -897,7 +991,7 @@ const createShader = (gl, source) => {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__types__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__types__ = __webpack_require__(6);
 
 
 class Uniform {
@@ -946,10 +1040,10 @@ class Uniform {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Program__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Vertex_glsl__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Program__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Vertex_glsl__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Vertex_glsl___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__Vertex_glsl__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Fragment_glsl__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Fragment_glsl__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Fragment_glsl___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__Fragment_glsl__);
 
 
@@ -968,12 +1062,12 @@ class Uniform {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Program__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__vertex_glsl__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Program__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__vertex_glsl__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__vertex_glsl___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__vertex_glsl__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__fragment_glsl__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__fragment_glsl__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__fragment_glsl___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__fragment_glsl__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Settings__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Settings__ = __webpack_require__(0);
 
 
 
@@ -1166,39 +1260,170 @@ const radToDeg = deg => deg * __180PI__
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Shape__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__math_Vec3__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Settings__ = __webpack_require__(1);
+const postData = object => {
+    if (!object) return null
+    let data = ''
+    for (var key in object)
+        data += `&${encodeURIComponent(key)}=${encodeURIComponent(object[key])}`
+    return data.substring(1)
+}
+
+/** Request data from server.
+ * 
+ * @param {{url:String, data, method: String}} options
+ * @returns {Promise}
+ */
+const req = (options) => {
+    return new Promise((resolve, reject) => {
+        const xmlHttp = new XMLHttpRequest()
+        xmlHttp.onreadystatechange = () => {
+            if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+                resolve(xmlHttp.responseText)
+        }
+        xmlHttp.open(options.method || 'GET', options.url, true)
+        xmlHttp.send(postData(options.data))
+    })
+}
+
+/* harmony default export */ __webpack_exports__["a"] = {
+
+    /** Get data using axaj.
+     * 
+     * @param {{url:String, data, method: String}} options
+     * @returns {Promise}
+     */
+    get(options) { return req(options) },
+
+    /** Get data  using axaj and parser it using JSON.parse().
+     * 
+     * @param {{url:String, data, method: String}} options
+     * @returns {Promise}
+     */
+    json(options) { return req(options).then(data => JSON.parse(data)) }
+};
+
+/***/ }),
+/* 23 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Settings__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__math_Vec3__ = __webpack_require__(1);
+
+
+const s = 1 + __WEBPACK_IMPORTED_MODULE_0__Settings__["a" /* default */].blocksSpacing
+
+class Arrow {
+
+    constructor(position, dir) {
+
+        this.position = new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */]((-position[1] - .5) * s, (-position[0] - .5) * s, -position[2])
+
+        switch (dir) {
+            case 0:
+                this.shape = new Float32Array([
+                    .5, .1, 0,
+                    .1, .5, 0,
+                    .9, .5, 0,
+                    .4, .5, 0,
+                    .4, .9, 0,
+                    .6, .9, 0,
+                    .6, .5, 0,
+                    .4, .5, 0,
+                    .6, .9, 0,
+                ])
+                break
+            case 1:
+                this.shape = new Float32Array([
+                    .1, .5, 0,
+                    .5, .1, 0,
+                    .5, .9, 0,
+                    .5, .4, 0,
+                    .9, .4, 0,
+                    .9, .6, 0,
+                    .5, .6, 0,
+                    .5, .4, 0,
+                    .9, .6, 0,
+                ])
+                break
+            case 2:
+                this.shape = new Float32Array([
+                    0.5, 0.9, 0,
+                    0.9, 0.5, 0,
+                    0.1, 0.5, 0,
+                    0.6, 0.5, 0,
+                    0.6, 0.1, 0,
+                    0.4, 0.1, 0,
+                    0.4, 0.5, 0,
+                    0.6, 0.5, 0,
+                    0.4, 0.1, 0
+                ])
+                break
+            case 3:
+                this.shape = new Float32Array([
+                    0.9, 0.5, 0,
+                    0.5, 0.9, 0,
+                    0.5, 0.1, 0,
+                    0.5, 0.6, 0,
+                    0.1, 0.6, 0,
+                    0.1, 0.4, 0,
+                    0.5, 0.4, 0,
+                    0.5, 0.6, 0,
+                    0.1, 0.4, 0
+                ])
+                break
+        }
+
+    }
+    draw(bp, gl) {
+        bp.position.set(this.position)
+        bp.color.set(this.style.sides.fill)
+        bp.vert.set(this.shape)
+        gl.drawArrays(gl.TRIANGLES, 0, this.shape.length / 3)
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Arrow;
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Shape__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__physics_coliders_Plane__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__math_Vec3__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Settings__ = __webpack_require__(0);
 
 
 
 
-const s = 1 + __WEBPACK_IMPORTED_MODULE_2__Settings__["a" /* default */].blocksSpacing
+
+const s = 1 + __WEBPACK_IMPORTED_MODULE_3__Settings__["a" /* default */].blocksSpacing
 
 class Flat {
 
-    constructor(position, height, renderSides = true) {
+    constructor(position, height) {
 
-        this.position = new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */](-position[1] * s, -position[0] * s, -position[2])
-        this.renderSides = renderSides
+        this.position = new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](-position[1], -position[0], -position[2])
 
         this.sides = [
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([ // back left
                 [1, 0, -height],
                 [1, 0, 0],
                 [0, 0, 0],
                 [0, 0, -height]
-            ], this.position), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([
+            ], this.position), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([ // fron left
                 [1, 1, -height],
                 [1, 1, 0],
                 [1, 0, 0],
                 [1, 0, -height]
-            ], this.position), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([
+            ], this.position), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([ // fron right
                 [1, 1, -height],
                 [1, 1, 0],
                 [0, 1, 0],
                 [0, 1, -height]
-            ], this.position), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([
+            ], this.position), __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([ // back right
                 [0, 1, -height],
                 [0, 1, 0],
                 [0, 0, 0],
@@ -1215,45 +1440,44 @@ class Flat {
 
         const [x, y, z] = this.position
         this.bottom = [
-            x, y + 1, z,
-            x + 1, y + 1, z,
-            x + 1, y + 1, z,
-            x + 1, y, z
+            (x - .5) * s, (y + .5) * s, z,
+            (x + .5) * s, (y + .5) * s, z,
+            (x + .5) * s, (y + .5) * s, z,
+            (x + .5) * s, (y - .5) * s, z
         ]
-    }
 
-    draw(bp, gl) {
-        bp.position.set(this.position)
-
-        this.sides[1].draw(bp, this.style.sides, gl)
-        this.sides[2].draw(bp, this.style.sides, gl)
-
-        this.top.draw(bp, this.style.top, gl)
+        this.topPlane = new __WEBPACK_IMPORTED_MODULE_1__physics_coliders_Plane__["a" /* default */](
+            new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](0, 0, -height + this.position[2]),
+            new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1, 0, -height + this.position[2]),
+            new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1, 1, -height + this.position[2])
+        )
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Flat;
 
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Shape__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__math_Vec3__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Settings__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Shape__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__physics_coliders_Plane__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__math_Vec3__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Settings__ = __webpack_require__(0);
 
 
 
 
-const s = 1 + __WEBPACK_IMPORTED_MODULE_2__Settings__["a" /* default */].blocksSpacing
+
+const s = 1 + __WEBPACK_IMPORTED_MODULE_3__Settings__["a" /* default */].blocksSpacing
 
 class Slide {
 
-    constructor(position, height, heights, renderSides = true) {
+    constructor(position, height, heights) {
 
-        this.position = new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */](-position[1] * s, -position[0] * s, -position[2])
-        this.renderSides = renderSides
+        this.position = new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](-position[1], -position[0], -position[2])
+
         this.sides = [
             __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([
                 [1, 0, -height - heights[0]],
@@ -1287,20 +1511,18 @@ class Slide {
 
         const [x, y, z] = this.position
         this.bottom = [
-            x, y + 1, z,
-            x + 1, y + 1, z,
-            x + 1, y + 1, z,
-            x + 1, y, z
+            (x - .5) * s, (y + .5) * s, z,
+            (x + .5) * s, (y + .5) * s, z,
+            (x + .5) * s, (y + .5) * s, z,
+            (x + .5) * s, (y - .5) * s, z
         ]
-    }
 
-    draw(bp, gl) {
-        bp.position.set(this.position)
 
-        this.top.draw(bp, this.style.top, gl)
-
-        this.sides[1].draw(bp, this.style.sides, gl)
-        this.sides[2].draw(bp, this.style.sides, gl)
+        this.topPlane = new __WEBPACK_IMPORTED_MODULE_1__physics_coliders_Plane__["a" /* default */](
+            new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](0 + this.position[0] - .5, 0 + this.position[1] - .5, -height - heights[3] + this.position[2]),
+            new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1 + this.position[0] - .5, 0 + this.position[1] - .5, -height - heights[0] + this.position[2]),
+            new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1 + this.position[0] - .5, 1 + this.position[1] - .5, -height - heights[1] + this.position[2])
+        )
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Slide;
@@ -1308,12 +1530,41 @@ class Slide {
 
 
 /***/ }),
-/* 24 */
+/* 26 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__math_Vec3__ = __webpack_require__(1);
+
+
+class Sphere {
+
+    /** 
+     *
+     * @param {Vec3} p center of Sphere
+     * @param {Number} r radius
+     */
+    constructor(p, r) {
+        this.p = p
+        this.r = r
+    }
+
+    distanceTo(plane) {
+        const v = __WEBPACK_IMPORTED_MODULE_0__math_Vec3__["a" /* default */].sub(this.p, plane.p)
+        const distance = plane.norm.dot(v) - this.r
+        return [Math.abs(distance), Math.sign(distance)]
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Sphere;
+
+
+/***/ }),
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Game__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Game__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Resources__ = __webpack_require__(2);
 
 
@@ -1323,60 +1574,11 @@ const game = new __WEBPACK_IMPORTED_MODULE_0__Game__["a" /* default */]({
     appendTo: document.getElementById('game'),
     control: window
 })
-game.start()
 
 __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__Resources__["a" /* waitForResources */])().then(() => {
-    game.map = __WEBPACK_IMPORTED_MODULE_1__Resources__["b" /* default */].maps['0102']
+    game.map = __WEBPACK_IMPORTED_MODULE_1__Resources__["b" /* default */].maps['0000']
+    game.start()
 })
-
-/***/ }),
-/* 25 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-class Shape {
-    constructor(points, v) {
-        if (points.length === 3) {
-            this.points = new Float32Array([
-                points[0][0] + v[0], points[0][1] + v[1], points[0][2] + v[2],
-                points[1][0] + v[0], points[1][1] + v[1], points[1][2] + v[2],
-                points[2][0] + v[0], points[2][1] + v[1], points[2][2] + v[2]
-            ])
-        } else {
-            this.points = new Float32Array([
-                points[0][0] + v[0], points[0][1] + v[1], points[0][2] + v[2],
-                points[1][0] + v[0], points[1][1] + v[1], points[1][2] + v[2],
-                points[2][0] + v[0], points[2][1] + v[1], points[2][2] + v[2],
-                points[2][0] + v[0], points[2][1] + v[1], points[2][2] + v[2],
-                points[3][0] + v[0], points[3][1] + v[1], points[3][2] + v[2],
-                points[0][0] + v[0], points[0][1] + v[1], points[0][2] + v[2]
-            ])
-        }
-    }
-
-    draw(bp, style, gl) {
-        bp.vert.set(this.points)
-        bp.color.set(style.fill)
-        gl.drawArrays(4, 0, this.points.length / 3) // TRIANGLES
-
-        bp.color.set(style.stroke)
-        gl.drawArrays(2, 0, this.points.length / 3) // LINE_LOOP
-    }
-    drawChecked(cp, style, gl) {
-        cp.vert.set(this.points)
-        cp.color1.set(style.top.fill)
-        cp.color2.set(style.sides.fill)
-        gl.drawArrays(4, 0, this.points.length / 3) // TRIANGLES
-
-        gl.drawArrays(2, 0, this.points.length / 3) // LINE_LOOP
-    }
-}
-
-const shape = (points, t) => {
-    return new Shape(points, t)
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = shape;
-
 
 /***/ })
 /******/ ]);

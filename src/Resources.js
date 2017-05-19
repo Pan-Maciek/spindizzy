@@ -21,6 +21,7 @@ load('0002', `${location.href}/resources/maps/map0002.json`)
 load('0010', `${location.href}/resources/maps/map0010.json`)
 load('0020', `${location.href}/resources/maps/map0020.json`)
 load('0102', `${location.href}/resources/maps/map0102.json`)
+load('testmap', `${location.href}/resources/maps/testmap.json`)
 
 export const waitForResources = () => Promise.all(__PRIMISSES__)
 

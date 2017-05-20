@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 27);
+/******/ 	return __webpack_require__(__webpack_require__.s = 28);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -114,7 +114,7 @@
 //         bottom: 'S',
 //         rigth: 'D'
 //     },
-//     blocksSpacing: .2, // %
+//     blocksSpacing: 0, // %
 //     zoom: 1
 // }
 
@@ -201,6 +201,7 @@ class Vec3 extends Float32Array {
         out[0] = this[0] * s
         out[1] = this[1] * s
         out[2] = this[2] * s
+        return out
     }
 
     get length() {
@@ -227,6 +228,20 @@ class Vec3 extends Float32Array {
         return new Vec3(v[0] * s, v[1] * s, v[2] * s)
     }
 
+    static corss(v1, v2) {
+        return v1.corss(v2, new Vec3)
+    }
+
+    /**
+     * @param {Vec3} vec
+     * @param {Vec3} norm
+     * @param {Number} bounce
+     */
+    static reflect(vec, norm, bounce) {
+        const newVec = Vec3.scale(norm, vec.dot(norm) * -2).add(vec).scale(bounce)
+        newVec[2] = 0
+        return newVec
+    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Vec3;
 
@@ -241,33 +256,66 @@ class Vec3 extends Float32Array {
 
 
 
-const __PRIMISSES__ = []
+const __PROMISSES__ = [
+    new Promise((resolve) => {
+        window.addEventListener('load', resolve)
+    })
+]
 const load = (resourceName, url, appendTo = __RESOURCES__.maps) => {
-    const prom = __WEBPACK_IMPORTED_MODULE_0__net_remote__["a" /* default */].json({ url })
-    __PRIMISSES__.push(prom.then(json => {
-        appendTo[resourceName] = new __WEBPACK_IMPORTED_MODULE_1__Map__["a" /* default */](json)
-    }))
-    return prom
+    url = location.href + url.match(/\.?\/?(.*)/)[1]
+
+    if (/\.json$/.test(url)) {
+        const prom = __WEBPACK_IMPORTED_MODULE_0__net_remote__["a" /* default */].json({ url })
+        __PROMISSES__.push(prom.then(json => {
+            appendTo[resourceName] = new __WEBPACK_IMPORTED_MODULE_1__Map__["a" /* default */](json)
+        }))
+        return prom
+    } else if (/\.(?:mp3)$/.test(url)) {
+        const prom = new Promise((resolve) => {
+            const audio = new Audio(url)
+            resolve()
+            appendTo[resourceName] = audio
+        })
+        __PROMISSES__.push(prom)
+        return prom
+    }
+}
+
+const loadMap = ID => {
+    load(ID, `./resources/maps/map${ID}.json`)
 }
 
 const __RESOURCES__ = {
-    maps: {}
+    maps: {},
+    sounds: {}
 }
 
-load('0000', `${location.href}/resources/maps/map0000.json`)
-load('0100', `${location.href}/resources/maps/map0100.json`)
-load('0001', `${location.href}/resources/maps/map0001.json`)
-load('0002', `${location.href}/resources/maps/map0002.json`)
-load('0010', `${location.href}/resources/maps/map0010.json`)
-load('0020', `${location.href}/resources/maps/map0020.json`)
-load('0102', `${location.href}/resources/maps/map0102.json`)
-load('testmap', `${location.href}/resources/maps/testmap.json`)
+loadMap('0000')
+loadMap('0001')
+loadMap('0002')
+loadMap('0010')
+loadMap('0020')
+loadMap('0100')
+loadMap('0102')
+loadMap('0200')
+loadMap('0201')
+loadMap('0300')
+loadMap('1000')
+loadMap('1002')
+loadMap('2000')
+loadMap('2001')
+loadMap('3000')
+loadMap('3001')
+load('testmap', './resources/maps/testmap.json')
 
-const waitForResources = () => Promise.all(__PRIMISSES__)
+load('diamond', './resources/sound/diamond.mp3', __RESOURCES__.sounds)
+
+const waitForResources = () => Promise.all(__PROMISSES__)
 /* harmony export (immutable) */ __webpack_exports__["a"] = waitForResources;
 
 
 /* harmony default export */ __webpack_exports__["b"] = __RESOURCES__;
+window.r = __RESOURCES__
 
 /***/ }),
 /* 3 */
@@ -279,32 +327,26 @@ const waitForResources = () => Promise.all(__PRIMISSES__)
 
 const s = 1 + __WEBPACK_IMPORTED_MODULE_0__Settings__["a" /* default */].blocksSpacing
 
-class Shape {
-    constructor(points, v) {
-        if (!v) v = [0, 0, 0]
-        else v = [v[0] - .5, v[1] - .5, v[2]]
-        if (points.length === 3) {
-            this.points = new Float32Array([
-                points[0][0] + v[0] * s, points[0][1] + v[1] * s, points[0][2] + v[2],
-                points[1][0] + v[0] * s, points[1][1] + v[1] * s, points[1][2] + v[2],
-                points[2][0] + v[0] * s, points[2][1] + v[1] * s, points[2][2] + v[2]
-            ])
-        } else {
-            this.points = new Float32Array([
-                points[0][0] + v[0] * s, points[0][1] + v[1] * s, points[0][2] + v[2],
-                points[1][0] + v[0] * s, points[1][1] + v[1] * s, points[1][2] + v[2],
-                points[2][0] + v[0] * s, points[2][1] + v[1] * s, points[2][2] + v[2],
-                points[2][0] + v[0] * s, points[2][1] + v[1] * s, points[2][2] + v[2],
-                points[3][0] + v[0] * s, points[3][1] + v[1] * s, points[3][2] + v[2],
-                points[0][0] + v[0] * s, points[0][1] + v[1] * s, points[0][2] + v[2]
-            ])
-        }
+const shape = (points, v) => {
+    if (!v) v = [0, 0, 0]
+    else v = [v[0] - .5, v[1] - .5, v[2]]
+    if (points.length === 3) {
+        return new Float32Array([
+            points[0][0] + v[0] * s, points[0][1] + v[1] * s, points[0][2] + v[2],
+            points[1][0] + v[0] * s, points[1][1] + v[1] * s, points[1][2] + v[2],
+            points[2][0] + v[0] * s, points[2][1] + v[1] * s, points[2][2] + v[2]
+        ])
+    } else {
+        return new Float32Array([
+            points[0][0] + v[0] * s, points[0][1] + v[1] * s, points[0][2] + v[2],
+            points[1][0] + v[0] * s, points[1][1] + v[1] * s, points[1][2] + v[2],
+            points[2][0] + v[0] * s, points[2][1] + v[1] * s, points[2][2] + v[2],
+            points[2][0] + v[0] * s, points[2][1] + v[1] * s, points[2][2] + v[2],
+            points[3][0] + v[0] * s, points[3][1] + v[1] * s, points[3][2] + v[2],
+            points[0][0] + v[0] * s, points[0][1] + v[1] * s, points[0][2] + v[2]
+        ])
     }
 }
-/* unused harmony export default */
-
-
-const shape = (points, t) => new Shape(points, t)
 /* harmony export (immutable) */ __webpack_exports__["a"] = shape;
 
 
@@ -313,25 +355,21 @@ const shape = (points, t) => new Shape(points, t)
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-class Color extends Float32Array {
-    constructor(r, g, b) {
-        super(3)
-        this[0] = r / 255
-        this[1] = g / 255
-        this[2] = b / 255
-    }
-}
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__gl_Color__ = __webpack_require__(30);
 
 class Style {
     constructor(style) {
         this.top = {
-            fill: new Color(...style.top.fill),
-            stroke: new Color(...style.top.stroke)
+            fill: new __WEBPACK_IMPORTED_MODULE_0__gl_Color__["a" /* default */](...style.top.fill),
+            stroke: new __WEBPACK_IMPORTED_MODULE_0__gl_Color__["a" /* default */](...style.top.stroke)
         }
+        let fill = new __WEBPACK_IMPORTED_MODULE_0__gl_Color__["a" /* default */](...style.sides.fill)
         this.sides = {
-            fill: new Color(...style.sides.fill),
-            stroke: new Color(...style.sides.stroke)
+            fill,
+            fillLight: __WEBPACK_IMPORTED_MODULE_0__gl_Color__["a" /* default */].avg(fill, this.top.fill),
+            stroke: new __WEBPACK_IMPORTED_MODULE_0__gl_Color__["a" /* default */](...style.sides.stroke)
         }
+
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Style;
@@ -508,7 +546,9 @@ class Plane {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__gl_programs_basic_Program__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__gl_programs_pixelize_Program__ = __webpack_require__(19);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Settings__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__Resources__ = __webpack_require__(2);
 /* harmony export (immutable) */ __webpack_exports__["a"] = Game;
+
 
 
 
@@ -565,33 +605,31 @@ function Game({
 
     control.addEventListener('keydown', e => {
         switch (e.keyCode) {
-            case 65: // a
-                move[0] = .1
+            case 37: // a
+                this.player.move[1] = -.2
                 break
-            case 68: // d
-                move[0] = -.1
+            case 39: // d
+                this.player.move[1] = .2
                 break
-            case 83: // s
-                move[1] = -.1
+            case 40: // s
+                this.player.move[0] = .2
                 break
-            case 87: // w
-                move[1] = .1
+            case 38: // w
+                this.player.move[0] = -.2
         }
     })
     control.addEventListener('keyup', e => {
         switch (e.keyCode) {
-            case 65: // a
-            case 68: // d
-                move[0] = 0
+            case 37: // a
+            case 39: // d
+                this.player.move[1] = 0
                 break
-            case 83: // s
-            case 87: // w
-                move[1] = 0
+            case 40: // s
+            case 38: // w
+                this.player.move[0] = 0
                 break
         }
     })
-
-    let move = [0, 0]
 
     let w = canvas.width = appendTo.clientWidth
     let h = canvas.height = appendTo.clientHeight
@@ -606,14 +644,35 @@ function Game({
 
     let i = 0, length
     this.map = null
+    this.mapE = 0
+    this.mapN = 0
 
-    this.player = new __WEBPACK_IMPORTED_MODULE_2__entities_Player__["a" /* default */]([-3, 0, 7])
-    gl.clearColor(64 / 255, 21 / 255, 207 / 255, 1)
-    
-    const update = () => {
-        this.player.force[0] = move[0]
-        this.player.force[1] = move[1]
-        this.player.update(this.map || [{ elements: [] }])
+    this.setMap = (n, e) => {
+        this.mapE = e
+        this.mapN = n
+        let map = ''
+        if (n > 0) map += `0${n}`
+        else map += `${-n}0`
+        if (e > 0) map += `0${e}`
+        else map += `${-e}0`
+
+
+        this.map = __WEBPACK_IMPORTED_MODULE_6__Resources__["b" /* default */].maps[map]
+
+        if (this.map) {
+            if (this.map.mapBackround) gl.clearColor(...this.map.mapBackround, 1)
+        } else this.map = { elements: [] }
+
+        console.log(map)
+    }
+    this.setMap(0, 0)
+
+    this.player = new __WEBPACK_IMPORTED_MODULE_2__entities_Player__["a" /* default */]([0, 0, 0])
+
+    const update = (dt) => {
+        if (this.map && this.map.update)
+            this.map.update(this, dt)
+        this.player.update(this.map, dt, this)
     }
 
     if (__WEBPACK_IMPORTED_MODULE_5__Settings__["a" /* default */].pixelFilter) {
@@ -623,20 +682,20 @@ function Game({
 
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-            if (this.map) this.map.draw(bp, gl)
+            if (this.map && this.map.elements.length) this.map.draw(bp, gl)
 
             this.player.draw(bp, gl)
-            
+
             pp.end()
         }
     } else {
         var draw = () => {
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-            if (this.map) this.map.draw(bp, gl)
+            if (this.map && this.map.elements.length) this.map.draw(bp, gl)
 
             this.player.draw(bp, gl)
-            
+
         }
     }
 
@@ -654,7 +713,7 @@ function Game({
         neadRedraw = acc > frameTime
         while (acc > frameTime) {
             acc -= frameTime
-            update()
+            update(frameTime / 1000)
         }
         if (neadRedraw) draw()
 
@@ -672,7 +731,7 @@ function Game({
     this.stop = () => {
         running = false
     }
-
+    window.player = this.player
     this.domElement = canvas
 }
 
@@ -709,6 +768,10 @@ module.exports = "precision lowp float;\r\n\r\nattribute vec2 position;\r\nattri
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__objects_Flat__ = __webpack_require__(24);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__objects_Slide__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__objects_Arrow__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__entities_Diamond__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__gl_Color__ = __webpack_require__(30);
+
+
 
 
 
@@ -723,11 +786,19 @@ class Map {
         this.styleGroups = []
         this.elements = []
         this.selfDrawn = []
+        this.entities = []
+        this.mapBackround = false
 
         for (let group of map) {
-            let topPoints = [], sidePoints = [], botPoints = []
+            if (group.extra) {
+                this.mapBackround = new __WEBPACK_IMPORTED_MODULE_5__gl_Color__["a" /* default */](...group.mapBackround)
+                continue
+            }
+
+
+            let topPoints = [], sidePoints = [], botPoints = [], lightSidePoints = []
             const style = new __WEBPACK_IMPORTED_MODULE_0__Style__["a" /* default */](group.style)
-            this.styleGroups.push({ botPoints, topPoints, sidePoints, style })
+            this.styleGroups.push({ botPoints, topPoints, sidePoints, style, lightSidePoints })
             for (var i = 0; i < group.elements.length; i++) {
                 const [type, ...args] = group.elements[i]
                 switch (type.toLowerCase()) {
@@ -742,12 +813,17 @@ class Map {
                         block.style = style
                         this.selfDrawn.push(block)
                         continue
+                    case 'diamond':
+                        var block = new __WEBPACK_IMPORTED_MODULE_4__entities_Diamond__["a" /* default */](...args)
+                        block.style = style
+                        this.entities.push(block)
+                        continue
                 }
-                topPoints.push(...block.top.points)
-                sidePoints.push(...block.sides[1].points)
-                sidePoints.push(...block.sides[2].points)
-                sidePoints.push(...block.sides[3].points)
-                sidePoints.push(...block.sides[0].points)
+                topPoints.push(...block.top)
+                sidePoints.push(...block.sides[1])
+                sidePoints.push(...block.sides[0])
+                lightSidePoints.push(...block.sides[2])
+                lightSidePoints.push(...block.sides[3])
                 botPoints.push(...block.bottom)
                 this.elements.push(block)
             }
@@ -760,10 +836,19 @@ class Map {
             this.styleGroups[i].sidelength = this.styleGroups[i].sidePoints.length / 3
             this.styleGroups[i].botPoints = new Float32Array(this.styleGroups[i].botPoints)
             this.styleGroups[i].botlength = this.styleGroups[i].botPoints.length / 3
+            this.styleGroups[i].lightSidePoints = new Float32Array(this.styleGroups[i].lightSidePoints)
+            this.styleGroups[i].lightSidelength = this.styleGroups[i].lightSidePoints.length / 3
+        }
+    }
+
+    update(game, dt) {
+        for (var i = 0; i < this.entities.length; i++) {
+            this.entities[i].update(game, dt)
         }
     }
 
     draw(bp, gl) {
+
         for (var i = 0; i < this.styleGroups.length; i++) {
             bp.position.set(position0)
             bp.vert.set(this.styleGroups[i].topPoints)
@@ -782,12 +867,24 @@ class Map {
             bp.color.set(this.styleGroups[i].style.sides.stroke)
             gl.drawArrays(gl.LINES, 0, this.styleGroups[i].sidelength)
 
+
+            bp.vert.set(this.styleGroups[i].lightSidePoints)
+            
+            bp.color.set(this.styleGroups[i].style.sides.fillLight)
+            gl.drawArrays(gl.TRIANGLES, 0, this.styleGroups[i].lightSidelength)
+
+            bp.color.set(this.styleGroups[i].style.sides.stroke)
+            gl.drawArrays(gl.LINES, 0, this.styleGroups[i].lightSidelength)
+
             bp.vert.set(this.styleGroups[i].botPoints)
             gl.drawArrays(gl.LINES, 0, this.styleGroups[i].botlength)
 
         }
         for (var i = 0; i < this.selfDrawn.length; i++) {
             this.selfDrawn[i].draw(bp, gl)
+        }
+        for (var i = 0; i < this.entities.length; i++) {
+            this.entities[i].draw(bp, gl)
         }
     }
 }
@@ -804,6 +901,10 @@ class Map {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Style__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__physics_coliders_Sphere__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Settings__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__math_Util__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__physics_const__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__Resources__ = __webpack_require__(2);
+
 
 
 
@@ -812,97 +913,160 @@ class Map {
 
 const s = 1 + __WEBPACK_IMPORTED_MODULE_4__Settings__["a" /* default */].blocksSpacing
 
+
+
 class Player {
     constructor(position) {
-        this.sphere = new __WEBPACK_IMPORTED_MODULE_3__physics_coliders_Sphere__["a" /* default */](new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */](-position[1], -position[0], -position[2]), .8)
+        this.sphere = new __WEBPACK_IMPORTED_MODULE_3__physics_coliders_Sphere__["a" /* default */](new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */](-position[1], -position[0], -position[2]), .5)
 
-        this.top = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([
-            [-.3, -.3, -1.6],
-            [.3, -.3, -1.6],
-            [.3, .3, -1.6],
-            [-.3, .3, -1.6]
-        ])
-
-        this.sides = [
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([[.3, -.3, -1.6],
-            [0, 0, -.8],
-            [-.3, -.3, -1.6]]),
-
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([[.3, .3, -1.6],
-            [0, 0, -.8],
-            [.3, -.3, -1.6]]),
-
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([[-.3, .3, -1.6],
-            [0, 0, -.8],
-            [.3, .3, -1.6]]),
-
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([[-.3, -.3, -1.6],
-            [0, 0, -.8],
-            [-.3, .3, -1.6]])
-        ]
+        this.velocity = new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */](0, 0, 0)
+        this.createShapes()
 
         this.style = new __WEBPACK_IMPORTED_MODULE_2__Style__["a" /* default */]({
             top: {
                 fill: [255, 255, 255],
-                stroke: [140, 8, 75]
+                stroke: [0, 0, 0]
             },
             sides: {
                 fill: [64, 21, 207],
-                stroke: [140, 8, 75]
+                stroke: [0, 0, 0]
             }
         })
-        this.force = new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */](0, 0, 0)
+        this.targetVelocity = new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */](0, 0, 0)
+        this.move = new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */](0, 0, 0)
         this.t = 0
+        this.lastBlockPos = new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */](0, 0, 0)
     }
+
+    createShapes() {
+
+        let temp = [1, 2, 3, 4], t = this.t
+
+        for (var i = 0; i < 4; i++) {
+            temp[i] = [Math.cos(t) * 0.4, Math.sin(t) * 0.4, -1.1]
+            t += Math.PI / 2
+        }
+
+        this.top = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])(temp)
+
+        this.sides = []
+        t = this.t
+
+        temp = [1, [0.5, 0.5, -.9], 3]
+
+        for (var i = 0; i < 4; i++) {
+            temp[0] = [Math.cos(t) * 0.4, Math.sin(t) * 0.4, -1.1]
+            t += Math.PI / 2
+            temp[2] = [Math.cos(t) * 0.4, Math.sin(t) * 0.4, -1.1]
+            this.sides.push(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])(temp))
+        }
+
+        const direction = (Math.sign(this.velocity[0]) || 1) * ((-Math.sign(this.velocity[1])) || 1)
+        const speed = Math.floor(this.velocity.length * 100) / 75
+
+        if (speed > 0.02) {
+            this.t -= speed * direction
+        }
+    }
+
     draw(bp, gl) {
         const pos = new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */](this.sphere.p[0] * s, this.sphere.p[1] * s, this.sphere.p[2])
         bp.position.set(pos)
 
-        // var t = this.t -= 0.1
-        // var topPoints = []
-        // topPoints.push([Math.cos(t) * 0.4, Math.sin(t) * 0.4, -1.6])
-        // t += Math.PI / 2
-        // topPoints.push([Math.cos(t) * 0.4, Math.sin(t) * 0.4, -1.6])
-        // t += Math.PI / 2
-        // topPoints.push([Math.cos(t) * 0.4, Math.sin(t) * 0.4, -1.6])
-        // t += Math.PI / 2
-        // topPoints.push([Math.cos(t) * 0.4, Math.sin(t) * 0.4, -1.6])
+        this.createShapes()
 
-        // this.top = shape(topPoints)
-
-        bp.vert.set(this.top.points)
+        bp.vert.set(this.top)
         bp.color.set(this.style.top.fill)
-        gl.drawArrays(gl.TRIANGLES, 0, this.top.points.length / 3)
+        gl.drawArrays(gl.TRIANGLES, 0, this.top.length / 3)
         bp.color.set(this.style.top.stroke)
-        gl.drawArrays(gl.LINE_LOOP, 0, this.top.points.length / 3)
+        gl.drawArrays(gl.LINE_LOOP, 0, this.top.length / 3)
 
         for (let i = 0; i < 4; i++) {
-            bp.vert.set(this.sides[i].points)
+            bp.vert.set(this.sides[i])
             bp.color.set(this.style.sides.fill)
-            gl.drawArrays(gl.TRIANGLES, 0, this.sides[i].points.length / 3)
+            gl.drawArrays(gl.TRIANGLES, 0, this.sides[i].length / 3)
             bp.color.set(this.style.sides.stroke)
-            gl.drawArrays(gl.LINE_LOOP, 0, this.sides[i].points.length / 3)
+            gl.drawArrays(gl.LINE_LOOP, 0, this.sides[i].length / 3)
         }
     }
-    update(blocks) {
-        this.sphere.p.add(new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */](0, 0, .1))
-        this.sphere.p.add(this.force)
 
-        x.innerText = ''
+    update(blocks, dt, game) {
+
+        this.sphere.p.add(this.velocity)
+        var temp = [0, 0, 0]
+
         for (var i = 0; i < blocks.elements.length; i++) {
+            var dx = Math.abs(blocks.elements[i].position[0] - this.sphere.p[0])
+            var dy = Math.abs(blocks.elements[i].position[1] - this.sphere.p[1])
 
-            if (Math.abs(blocks.elements[i].position[0] - this.sphere.p[0]) > .5) continue
-            if (Math.abs(blocks.elements[i].position[1] - this.sphere.p[1]) > .5) continue
+            if (dx > 0.5) continue
+            if (dy > 0.5) continue
 
-            var data = blocks.elements[i].topPlane.intersect(this.sphere)
 
-            if (data[1] > 0 && data[0] < this.sphere.r) {
-                let v = (__WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */].scale(blocks.elements[i].topPlane.norm, -data[0]))
+            var topData = blocks.elements[i].topPlane.intersect(this.sphere)
 
-                x.innerText = v
+            if (topData[1] > 0 && topData[0] < this.sphere.r) {
+                var v = (__WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */].scale(blocks.elements[i].topPlane.norm, -topData[0]))
+
                 this.sphere.p.add(v)
-                break
+                temp[0] -= blocks.elements[i].topPlane.norm[0]
+                temp[1] -= blocks.elements[i].topPlane.norm[1]
+                temp[2] -= blocks.elements[i].topPlane.norm[2]
+                this.lastBlock = blocks.elements[i]
+                this.lastMapN = game.mapN
+                this.lastMapE = game.mapE
             }
+
+            if (blocks.elements[i].position[2] <= this.sphere.p[2] &&
+                blocks.elements[i].position[2] + blocks.elements[i].height > this.sphere.p[2] + this.sphere.r) {
+
+                this.sphere.p.sub(this.velocity)
+                this.velocity = __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */].reflect(this.velocity, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__math_Util__["b" /* side */])(blocks.elements[i].position, this.sphere.p), 0.9)
+            }
+
+        }
+
+        // changing maps
+        if (this.sphere.p[0] < -4.5) {
+            game.mapN += 1
+            this.sphere.p[0] = 3.5
+            game.setMap(game.mapN, game.mapE)
+        } else if (this.sphere.p[0] > 3.5) {
+            game.mapN -= 1
+            this.sphere.p[0] = -4.5
+            game.setMap(game.mapN, game.mapE)
+        }
+        if (this.sphere.p[1] < -4.5) {
+            game.mapE -= 1
+            this.sphere.p[1] = 3.5
+            game.setMap(game.mapN, game.mapE)
+        } else if (this.sphere.p[1] > 3.5) {
+            game.mapE += 1
+            this.sphere.p[1] = -4.5
+            game.setMap(game.mapN, game.mapE)
+        }
+
+        this.velocity[0] =
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__math_Util__["c" /* approach */])(this.targetVelocity[0] + this.move[0] + __WEBPACK_IMPORTED_MODULE_6__physics_const__["a" /* Gravity */][0] + temp[0], this.velocity[0], dt / 5)
+        this.velocity[1] =
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__math_Util__["c" /* approach */])(this.targetVelocity[1] + this.move[1] + __WEBPACK_IMPORTED_MODULE_6__physics_const__["a" /* Gravity */][1] + temp[1], this.velocity[1], dt / 5)
+        this.velocity[2] =
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__math_Util__["c" /* approach */])(this.targetVelocity[2] + this.move[2] + __WEBPACK_IMPORTED_MODULE_6__physics_const__["a" /* Gravity */][2] + temp[2], this.velocity[2], dt / 3)
+
+
+        if (this.sphere.p[2] > 2.5) {
+            this.velocity[0] = 0
+            this.velocity[1] = 0
+            this.velocity[2] = 0
+
+            this.move[0] = 0
+            this.move[1] = 0
+            this.move[2] = 0
+
+            this.sphere.p[0] = this.lastBlock.position[0]
+            this.sphere.p[1] = this.lastBlock.position[1]
+            this.sphere.p[2] = this.lastBlock.position[2] - this.lastBlock.height + this.sphere.r
+            game.setMap(this.lastMapN, this.lastMapE)
         }
     }
 }
@@ -1236,6 +1400,8 @@ class Mat4 extends Float32Array {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Vec3__ = __webpack_require__(1);
+
 const __PI180__ = Math.PI / 180
 const __180PI__ = 180 / Math.PI
 
@@ -1253,6 +1419,38 @@ const degToRad = deg => deg * __PI180__
  */
 const radToDeg = deg => deg * __180PI__
 /* unused harmony export radToDeg */
+
+
+const approach = (goal, current, dt) => {
+
+    const distance = goal - current
+
+    if (distance > dt)
+        return current + dt
+    if (distance < -dt)
+        return current - dt
+
+    return goal
+}
+/* harmony export (immutable) */ __webpack_exports__["c"] = approach;
+
+
+const v010 = new __WEBPACK_IMPORTED_MODULE_0__Vec3__["a" /* default */](0, 1, 0)
+const v100 = new __WEBPACK_IMPORTED_MODULE_0__Vec3__["a" /* default */](1, 0, 0)
+
+const side = (p1, p2) => {
+    const dx = p1[0] - p2[0]
+    const dy = p1[1] - p2[1]
+
+    if (dy > dx) {
+        if (dy > -dx) return v010
+        else return v100
+    } else {
+        if (dy > -dx) return v100
+        else return v010
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["b"] = side;
 
 
 /***/ }),
@@ -1404,7 +1602,7 @@ const s = 1 + __WEBPACK_IMPORTED_MODULE_3__Settings__["a" /* default */].blocksS
 class Flat {
 
     constructor(position, height) {
-
+        this.height = height
         this.position = new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](-position[1], -position[0], -position[2])
 
         this.sides = [
@@ -1451,6 +1649,33 @@ class Flat {
             new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1, 0, -height + this.position[2]),
             new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1, 1, -height + this.position[2])
         )
+
+        this.sidePlanes = [
+            new __WEBPACK_IMPORTED_MODULE_1__physics_coliders_Plane__["a" /* default */]( // back left
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1, 0, -height),
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1, 0, 0),
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](0, 0, 0)
+            ),
+            
+            new __WEBPACK_IMPORTED_MODULE_1__physics_coliders_Plane__["a" /* default */]( // fron left
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1, 1, -height),
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1, 1, 0),
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1, 0, 0)
+            ),
+            
+            new __WEBPACK_IMPORTED_MODULE_1__physics_coliders_Plane__["a" /* default */]( // fron right
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1, 1, -height),
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1, 1, 0),
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](0, 1, 0)
+            ),
+
+            new __WEBPACK_IMPORTED_MODULE_1__physics_coliders_Plane__["a" /* default */]( // back right
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](0, 1, -height),
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](0, 1, 0),
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](0, 0, 0)
+            )
+        ]
+
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Flat;
@@ -1476,6 +1701,7 @@ class Slide {
 
     constructor(position, height, heights) {
 
+        this.height = height
         this.position = new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](-position[1], -position[0], -position[2])
 
         this.sides = [
@@ -1523,6 +1749,33 @@ class Slide {
             new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1 + this.position[0] - .5, 0 + this.position[1] - .5, -height - heights[0] + this.position[2]),
             new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1 + this.position[0] - .5, 1 + this.position[1] - .5, -height - heights[1] + this.position[2])
         )
+
+        this.sidePlanes = [
+            new __WEBPACK_IMPORTED_MODULE_1__physics_coliders_Plane__["a" /* default */]( // back left
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1, 0, -height),
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1, 0, 0),
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](0, 0, 0)
+            ),
+
+            new __WEBPACK_IMPORTED_MODULE_1__physics_coliders_Plane__["a" /* default */]( // fron left
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1, 1, -height),
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1, 1, 0),
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1, 0, 0)
+            ),
+
+            new __WEBPACK_IMPORTED_MODULE_1__physics_coliders_Plane__["a" /* default */]( // fron right
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1, 1, -height),
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](1, 1, 0),
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](0, 1, 0)
+            ),
+
+            new __WEBPACK_IMPORTED_MODULE_1__physics_coliders_Plane__["a" /* default */]( // back right
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](0, 1, -height),
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](0, 1, 0),
+                new __WEBPACK_IMPORTED_MODULE_2__math_Vec3__["a" /* default */](0, 0, 0)
+            )
+        ]
+
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Slide;
@@ -1563,6 +1816,18 @@ class Sphere {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__math_Vec3__ = __webpack_require__(1);
+
+
+const Gravity = new __WEBPACK_IMPORTED_MODULE_0__math_Vec3__["a" /* default */](0, 0, .5)
+/* harmony export (immutable) */ __webpack_exports__["a"] = Gravity;
+
+
+/***/ }),
+/* 28 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Game__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Resources__ = __webpack_require__(2);
@@ -1570,15 +1835,136 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-const game = new __WEBPACK_IMPORTED_MODULE_0__Game__["a" /* default */]({
-    appendTo: document.getElementById('game'),
-    control: window
-})
 
 __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__Resources__["a" /* waitForResources */])().then(() => {
+    const game = new __WEBPACK_IMPORTED_MODULE_0__Game__["a" /* default */]({
+        appendTo: document.getElementById('game'),
+        control: window
+    })
     game.map = __WEBPACK_IMPORTED_MODULE_1__Resources__["b" /* default */].maps['0000']
     game.start()
 })
+
+/***/ }),
+/* 29 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Shape__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__math_Vec3__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Style__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__physics_coliders_Sphere__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Settings__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Resources__ = __webpack_require__(2);
+
+
+
+
+
+
+const s = 1 + __WEBPACK_IMPORTED_MODULE_4__Settings__["a" /* default */].blocksSpacing
+
+
+class Player {
+    constructor(position) {
+        this.sphere = new __WEBPACK_IMPORTED_MODULE_3__physics_coliders_Sphere__["a" /* default */](new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */](-position[1], -position[0], -position[2]), .8)
+
+        this.top = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([
+            [-.5, 0, -0.5],
+            [0, -.5, -0.5],
+            [.5, 0, -0.5],
+            [0, .5, -0.5]
+        ])
+
+        this.sides = [
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([[.5, 0, -0.5],
+            [0, 0, 0],
+            [0, -.5, -0.5]]),
+
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([[0, .5, -0.5],
+            [0, 0, 0],
+            [.5, 0, -0.5]]),
+
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([[-.5, 0, -0.5],
+            [0, 0, 0],
+            [0, .5, -0.5]]),
+
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([[0, -.5, -0.5],
+            [0, 0, 0],
+            [-.5, 0, -0.5]]),
+
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([[.5, 0, -0.5],
+            [0, 0, -0.9],
+            [0, -.5, -0.5]]),
+
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([[0, .5, -0.5],
+            [0, 0, -0.9],
+            [.5, 0, -0.5]]),
+
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([[-.5, 0, -0.5],
+            [0, 0, -0.9],
+            [0, .5, -0.5]]),
+
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shape__["a" /* shape */])([[0, -.5, -0.5],
+            [0, 0, -0.9],
+            [-.5, 0, -0.5]])
+        ]
+
+        this.t = 0
+        this.collected = false
+    }
+    draw(bp, gl) {
+        if (this.collected) return
+        const pos = new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */](this.sphere.p[0] * s, this.sphere.p[1] * s, this.sphere.p[2])
+        bp.position.set(pos)
+
+        for (let i = 0; i < 8; i++) {
+            bp.vert.set(this.sides[i])
+            bp.color.set(new Float32Array([Math.random(), Math.random(), Math.random()]))
+            gl.drawArrays(gl.TRIANGLES, 0, this.sides[i].length / 3)
+            bp.color.set(this.style.sides.stroke)
+            gl.drawArrays(gl.LINE_LOOP, 0, this.sides[i].length / 3)
+        }
+    }
+
+    update(game, dt) {
+        if (
+            !this.collected &&
+            this.sphere.p.distanceTo(game.player.sphere.p) < 0.75 &&
+            Math.abs(game.player.sphere.p[2] - this.sphere.p[2]) > 0.1
+        ) {
+            this.collected = true
+            __WEBPACK_IMPORTED_MODULE_5__Resources__["b" /* default */].sounds.diamond.play()
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Player;
+
+
+
+/***/ }),
+/* 30 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+class Color extends Float32Array {
+    constructor(r, g, b) {
+        super(3)
+        this[0] = r / 255
+        this[1] = g / 255
+        this[2] = b / 255
+    }
+    static avg(color1, color2) {
+        
+        return new Color(
+            (color1[0] + color2[0]) / 2 * 220,
+            (color1[1] + color2[1]) / 2 * 220,
+            (color1[2] + color2[2]) / 2 * 220
+        )
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Color;
+
 
 /***/ })
 /******/ ]);

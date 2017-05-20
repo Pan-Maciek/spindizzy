@@ -41,6 +41,6 @@ export default {
 //         bottom: 'S',
 //         rigth: 'D'
 //     },
-//     blocksSpacing: .2, // %
+//     blocksSpacing: 0, // %
 //     zoom: 1
 // }

@@ -76,6 +76,7 @@ export default class Vec3 extends Float32Array {
         out[0] = this[0] * s
         out[1] = this[1] * s
         out[2] = this[2] * s
+        return out
     }
 
     get length() {
@@ -102,4 +103,18 @@ export default class Vec3 extends Float32Array {
         return new Vec3(v[0] * s, v[1] * s, v[2] * s)
     }
 
+    static corss(v1, v2) {
+        return v1.corss(v2, new Vec3)
+    }
+
+    /**
+     * @param {Vec3} vec
+     * @param {Vec3} norm
+     * @param {Number} bounce
+     */
+    static reflect(vec, norm, bounce) {
+        const newVec = Vec3.scale(norm, vec.dot(norm) * -2).add(vec).scale(bounce)
+        newVec[2] = 0
+        return newVec
+    }
 }

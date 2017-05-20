@@ -9,6 +9,7 @@ export default class Slide {
 
     constructor(position, height, heights) {
 
+        this.height = height
         this.position = new Vec3(-position[1], -position[0], -position[2])
 
         this.sides = [
@@ -56,5 +57,32 @@ export default class Slide {
             new Vec3(1 + this.position[0] - .5, 0 + this.position[1] - .5, -height - heights[0] + this.position[2]),
             new Vec3(1 + this.position[0] - .5, 1 + this.position[1] - .5, -height - heights[1] + this.position[2])
         )
+
+        this.sidePlanes = [
+            new Plane( // back left
+                new Vec3(1, 0, -height),
+                new Vec3(1, 0, 0),
+                new Vec3(0, 0, 0)
+            ),
+
+            new Plane( // fron left
+                new Vec3(1, 1, -height),
+                new Vec3(1, 1, 0),
+                new Vec3(1, 0, 0)
+            ),
+
+            new Plane( // fron right
+                new Vec3(1, 1, -height),
+                new Vec3(1, 1, 0),
+                new Vec3(0, 1, 0)
+            ),
+
+            new Plane( // back right
+                new Vec3(0, 1, -height),
+                new Vec3(0, 1, 0),
+                new Vec3(0, 0, 0)
+            )
+        ]
+
     }
 }

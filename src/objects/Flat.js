@@ -8,7 +8,7 @@ const s = 1 + Settings.blocksSpacing
 export default class Flat {
 
     constructor(position, height) {
-
+        this.height = height
         this.position = new Vec3(-position[1], -position[0], -position[2])
 
         this.sides = [
@@ -55,5 +55,32 @@ export default class Flat {
             new Vec3(1, 0, -height + this.position[2]),
             new Vec3(1, 1, -height + this.position[2])
         )
+
+        this.sidePlanes = [
+            new Plane( // back left
+                new Vec3(1, 0, -height),
+                new Vec3(1, 0, 0),
+                new Vec3(0, 0, 0)
+            ),
+            
+            new Plane( // fron left
+                new Vec3(1, 1, -height),
+                new Vec3(1, 1, 0),
+                new Vec3(1, 0, 0)
+            ),
+            
+            new Plane( // fron right
+                new Vec3(1, 1, -height),
+                new Vec3(1, 1, 0),
+                new Vec3(0, 1, 0)
+            ),
+
+            new Plane( // back right
+                new Vec3(0, 1, -height),
+                new Vec3(0, 1, 0),
+                new Vec3(0, 0, 0)
+            )
+        ]
+
     }
 }

@@ -1,4 +1,7 @@
 [{
+    "extra": true,
+    "mapBackround": [0, 0, 0]
+}, {
     "style": {
         "top": {
             "fill": [190, 255, 109],

@@ -1,6 +1,6 @@
 [{
     "extra": true,
-    "mapBackround": [95, 95, 95]
+    "mapBackround": [64, 21, 207]
 }, {
     "style": {
         "top": {
@@ -8,7 +8,7 @@
             "stroke": [255, 255, 255]
         },
         "sides": {
-            "fill": [22, 147, 15],
+            "fill": [140, 8, 75],
             "stroke": [255, 255, 255]
         }
     },

@@ -5,6 +5,7 @@ import Player from './entities/Player'
 import BasicProgram from './gl/programs/basic/Program'
 import PixelProgram from './gl/programs/pixelize/Program'
 import Settings from './Settings'
+import Resources from './Resources'
 
 const cos = Math.cos(degToRad(Settings.projectionAngle))
 const sin = Math.sin(degToRad(Settings.projectionAngle))
@@ -54,33 +55,31 @@ export default function Game({
 
     control.addEventListener('keydown', e => {
         switch (e.keyCode) {
-            case 65: // a
-                move[0] = .1
+            case 37: // a
+                this.player.move[1] = -.2
                 break
-            case 68: // d
-                move[0] = -.1
+            case 39: // d
+                this.player.move[1] = .2
                 break
-            case 83: // s
-                move[1] = -.1
+            case 40: // s
+                this.player.move[0] = .2
                 break
-            case 87: // w
-                move[1] = .1
+            case 38: // w
+                this.player.move[0] = -.2
         }
     })
     control.addEventListener('keyup', e => {
         switch (e.keyCode) {
-            case 65: // a
-            case 68: // d
-                move[0] = 0
+            case 37: // a
+            case 39: // d
+                this.player.move[1] = 0
                 break
-            case 83: // s
-            case 87: // w
-                move[1] = 0
+            case 40: // s
+            case 38: // w
+                this.player.move[0] = 0
                 break
         }
     })
-
-    let move = [0, 0]
 
     let w = canvas.width = appendTo.clientWidth
     let h = canvas.height = appendTo.clientHeight
@@ -95,14 +94,35 @@ export default function Game({
 
     let i = 0, length
     this.map = null
+    this.mapE = 0
+    this.mapN = 0
 
-    this.player = new Player([-3, 0, 7])
-    gl.clearColor(64 / 255, 21 / 255, 207 / 255, 1)
-    
-    const update = () => {
-        this.player.force[0] = move[0]
-        this.player.force[1] = move[1]
-        this.player.update(this.map || [{ elements: [] }])
+    this.setMap = (n, e) => {
+        this.mapE = e
+        this.mapN = n
+        let map = ''
+        if (n > 0) map += `0${n}`
+        else map += `${-n}0`
+        if (e > 0) map += `0${e}`
+        else map += `${-e}0`
+
+
+        this.map = Resources.maps[map]
+
+        if (this.map) {
+            if (this.map.mapBackround) gl.clearColor(...this.map.mapBackround, 1)
+        } else this.map = { elements: [] }
+
+        console.log(map)
+    }
+    this.setMap(0, 0)
+
+    this.player = new Player([0, 0, 0])
+
+    const update = (dt) => {
+        if (this.map && this.map.update)
+            this.map.update(this, dt)
+        this.player.update(this.map, dt, this)
     }
 
     if (Settings.pixelFilter) {
@@ -112,20 +132,20 @@ export default function Game({
 
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-            if (this.map) this.map.draw(bp, gl)
+            if (this.map && this.map.elements.length) this.map.draw(bp, gl)
 
             this.player.draw(bp, gl)
-            
+
             pp.end()
         }
     } else {
         var draw = () => {
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-            if (this.map) this.map.draw(bp, gl)
+            if (this.map && this.map.elements.length) this.map.draw(bp, gl)
 
             this.player.draw(bp, gl)
-            
+
         }
     }
 
@@ -143,7 +163,7 @@ export default function Game({
         neadRedraw = acc > frameTime
         while (acc > frameTime) {
             acc -= frameTime
-            update()
+            update(frameTime / 1000)
         }
         if (neadRedraw) draw()
 
@@ -161,6 +181,6 @@ export default function Game({
     this.stop = () => {
         running = false
     }
-
+    window.player = this.player
     this.domElement = canvas
 }

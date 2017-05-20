@@ -1,28 +1,61 @@
 import remote from './net/remote'
 import Map from './Map'
 
-const __PRIMISSES__ = []
+const __PROMISSES__ = [
+    new Promise((resolve) => {
+        window.addEventListener('load', resolve)
+    })
+]
 const load = (resourceName, url, appendTo = __RESOURCES__.maps) => {
-    const prom = remote.json({ url })
-    __PRIMISSES__.push(prom.then(json => {
-        appendTo[resourceName] = new Map(json)
-    }))
-    return prom
+    url = location.href + url.match(/\.?\/?(.*)/)[1]
+
+    if (/\.json$/.test(url)) {
+        const prom = remote.json({ url })
+        __PROMISSES__.push(prom.then(json => {
+            appendTo[resourceName] = new Map(json)
+        }))
+        return prom
+    } else if (/\.(?:mp3)$/.test(url)) {
+        const prom = new Promise((resolve) => {
+            const audio = new Audio(url)
+            resolve()
+            appendTo[resourceName] = audio
+        })
+        __PROMISSES__.push(prom)
+        return prom
+    }
+}
+
+const loadMap = ID => {
+    load(ID, `./resources/maps/map${ID}.json`)
 }
 
 const __RESOURCES__ = {
-    maps: {}
+    maps: {},
+    sounds: {}
 }
 
-load('0000', `${location.href}/resources/maps/map0000.json`)
-load('0100', `${location.href}/resources/maps/map0100.json`)
-load('0001', `${location.href}/resources/maps/map0001.json`)
-load('0002', `${location.href}/resources/maps/map0002.json`)
-load('0010', `${location.href}/resources/maps/map0010.json`)
-load('0020', `${location.href}/resources/maps/map0020.json`)
-load('0102', `${location.href}/resources/maps/map0102.json`)
-load('testmap', `${location.href}/resources/maps/testmap.json`)
+loadMap('0000')
+loadMap('0001')
+loadMap('0002')
+loadMap('0010')
+loadMap('0020')
+loadMap('0100')
+loadMap('0102')
+loadMap('0200')
+loadMap('0201')
+loadMap('0300')
+loadMap('1000')
+loadMap('1002')
+loadMap('2000')
+loadMap('2001')
+loadMap('3000')
+loadMap('3001')
+load('testmap', './resources/maps/testmap.json')
 
-export const waitForResources = () => Promise.all(__PRIMISSES__)
+load('diamond', './resources/sound/diamond.mp3', __RESOURCES__.sounds)
+
+export const waitForResources = () => Promise.all(__PROMISSES__)
 
 export default __RESOURCES__
+window.r = __RESOURCES__

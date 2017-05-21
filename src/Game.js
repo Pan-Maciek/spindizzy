@@ -56,16 +56,16 @@ export default function Game({
     control.addEventListener('keydown', e => {
         switch (e.keyCode) {
             case 37: // a
-                this.player.move[1] = -.2
+                this.player.move[1] = -.3
                 break
             case 39: // d
-                this.player.move[1] = .2
+                this.player.move[1] = .3
                 break
             case 40: // s
-                this.player.move[0] = .2
+                this.player.move[0] = .3
                 break
             case 38: // w
-                this.player.move[0] = -.2
+                this.player.move[0] = -.3
         }
     })
     control.addEventListener('keyup', e => {
@@ -112,10 +112,9 @@ export default function Game({
         if (this.map) {
             if (this.map.mapBackround) gl.clearColor(...this.map.mapBackround, 1)
         } else this.map = { elements: [] }
-
+        
         console.log(map)
     }
-    this.setMap(0, 0)
 
     this.player = new Player([0, 0, 0])
 
@@ -183,4 +182,5 @@ export default function Game({
     }
     window.player = this.player
     this.domElement = canvas
+    this.setMap(0, 0)
 }

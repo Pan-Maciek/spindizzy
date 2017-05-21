@@ -96,7 +96,6 @@ export default class Player {
             if (dx > 0.5) continue
             if (dy > 0.5) continue
 
-
             var topData = blocks.elements[i].topPlane.intersect(this.sphere)
 
             if (topData[1] > 0 && topData[0] < this.sphere.r) {
@@ -114,8 +113,9 @@ export default class Player {
             if (blocks.elements[i].position[2] <= this.sphere.p[2] &&
                 blocks.elements[i].position[2] + blocks.elements[i].height > this.sphere.p[2] + this.sphere.r) {
 
+                const vel = Vec3.reflect(this.velocity, side(blocks.elements[i].position, this.sphere.p), 0.9)
                 this.sphere.p.sub(this.velocity)
-                this.velocity = Vec3.reflect(this.velocity, side(blocks.elements[i].position, this.sphere.p), 0.9)
+                this.velocity = vel
             }
 
         }

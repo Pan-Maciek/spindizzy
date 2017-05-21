@@ -7,6 +7,8 @@ import Settings from '../Settings'
 const s = 1 + Settings.blocksSpacing
 import Resources from '../Resources'
 
+const black = new Float32Array([0, 0, 0])
+
 export default class Player {
     constructor(position) {
         this.sphere = new Sphere(new Vec3(-position[1], -position[0], -position[2]), .8)
@@ -64,7 +66,7 @@ export default class Player {
             bp.vert.set(this.sides[i])
             bp.color.set(new Float32Array([Math.random(), Math.random(), Math.random()]))
             gl.drawArrays(gl.TRIANGLES, 0, this.sides[i].length / 3)
-            bp.color.set(this.style.sides.stroke)
+            bp.color.set(black)
             gl.drawArrays(gl.LINE_LOOP, 0, this.sides[i].length / 3)
         }
     }

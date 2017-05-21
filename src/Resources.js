@@ -30,27 +30,27 @@ const loadMap = ID => {
     load(ID, `./resources/maps/map${ID}.json`)
 }
 
+const loadMaps = (...maps) => {
+    for (const map of maps) {
+        loadMap(map)
+    }
+}
+
 const __RESOURCES__ = {
     maps: {},
     sounds: {}
 }
 
-loadMap('0000')
-loadMap('0001')
-loadMap('0002')
-loadMap('0010')
-loadMap('0020')
-loadMap('0100')
-loadMap('0102')
-loadMap('0200')
-loadMap('0201')
-loadMap('0300')
-loadMap('1000')
-loadMap('1002')
-loadMap('2000')
-loadMap('2001')
-loadMap('3000')
-loadMap('3001')
+loadMaps(
+    '0000', '0001', '0002', '0003',
+    '0010', '0020',
+    '0100', '0102', '0103',
+    '0200', '0201',
+    '0300', '0301', '0302', '0303',
+    '1000', '1002', '1003',
+    '2000', '2001',
+    '3000', '3001'
+)
 load('testmap', './resources/maps/testmap.json')
 
 load('diamond', './resources/sound/diamond.mp3', __RESOURCES__.sounds)

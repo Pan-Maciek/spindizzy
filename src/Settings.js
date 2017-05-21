@@ -18,7 +18,7 @@
 export default {
     pixelFilter: false,
     frameTime: 30, // ms
-    projectionAngle: 28,
+    projectionAngle: 30,
     keys: {
         fire: 'space',
         top: 'W',

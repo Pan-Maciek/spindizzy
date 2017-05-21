@@ -4,6 +4,7 @@ import Slide from './objects/Slide'
 import Arrow from './objects/Arrow'
 import Diamond from './entities/Diamond'
 import Color from './gl/Color'
+import Water from './objects/Water'
 
 const position0 = new Float32Array([0, 0, 0])
 
@@ -46,6 +47,11 @@ export default class Map {
                         block.style = style
                         this.entities.push(block)
                         continue
+                    case 'water':
+                        var block = new Water(...args)
+                        block.style = style
+                        this.selfDrawn.push(block)
+                        continue
                 }
                 topPoints.push(...block.top)
                 sidePoints.push(...block.sides[1])
@@ -79,6 +85,7 @@ export default class Map {
 
         for (var i = 0; i < this.styleGroups.length; i++) {
             bp.position.set(position0)
+            if (this.styleGroups[i].toplength === 0) continue
             bp.vert.set(this.styleGroups[i].topPoints)
 
             bp.color.set(this.styleGroups[i].style.top.fill)
@@ -97,7 +104,7 @@ export default class Map {
 
 
             bp.vert.set(this.styleGroups[i].lightSidePoints)
-            
+
             bp.color.set(this.styleGroups[i].style.sides.fillLight)
             gl.drawArrays(gl.TRIANGLES, 0, this.styleGroups[i].lightSidelength)
 

@@ -111,6 +111,7 @@ export default class Vec3 extends Float32Array {
      * @param {Vec3} vec
      * @param {Vec3} norm
      * @param {Number} bounce
+     * @returns {Vec3}
      */
     static reflect(vec, norm, bounce) {
         const newVec = Vec3.scale(norm, vec.dot(norm) * -2).add(vec).scale(bounce)

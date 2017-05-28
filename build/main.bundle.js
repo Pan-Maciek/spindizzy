@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 30);
+/******/ 	return __webpack_require__(__webpack_require__.s = 31);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -184,6 +184,7 @@ class Vec3 extends Float32Array {
      * @param {Vec3} vec
      * @param {Vec3} norm
      * @param {Number} bounce
+     * @returns {Vec3}
      */
     static reflect(vec, norm, bounce) {
         const newVec = Vec3.scale(norm, vec.dot(norm) * -2).add(vec).scale(bounce)
@@ -285,33 +286,26 @@ const loadMap = ID => {
     load(ID, `./resources/maps/map${ID}.json`)
 }
 
+const loadMaps = (...maps) => {
+    for (const map of maps) 
+        loadMap(map)
+}
+
 const __RESOURCES__ = {
     maps: {},
     sounds: {}
 }
 
-loadMap('0000')
-loadMap('0001')
-loadMap('0002')
-loadMap('0003')
-loadMap('1003')
-loadMap('0010')
-loadMap('0020')
-loadMap('0100')
-loadMap('0102')
-loadMap('0103')
-loadMap('0200')
-loadMap('0201')
-loadMap('0300')
-loadMap('0301')
-loadMap('0302')
-loadMap('0303')
-loadMap('1000')
-loadMap('1002')
-loadMap('2000')
-loadMap('2001')
-loadMap('3000')
-loadMap('3001')
+loadMaps(
+    '0000', '0001', '0002', '0003',
+    '0010', '0020',
+    '0100', '0102', '0103',
+    '0200', '0201',
+    '0300', '0301', '0302', '0303',
+    '1000', '1002', '1003',
+    '2000', '2001',
+    '3000', '3001'
+)
 load('testmap', './resources/maps/testmap.json')
 
 load('diamond', './resources/sound/diamond.mp3', __RESOURCES__.sounds)
@@ -363,6 +357,7 @@ const shape = (points, v) => {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__gl_Color__ = __webpack_require__(5);
 
+
 class Style {
     constructor(style) {
         this.top = {
@@ -372,7 +367,7 @@ class Style {
         let fill = new __WEBPACK_IMPORTED_MODULE_0__gl_Color__["a" /* default */](...style.sides.fill)
         this.sides = {
             fill,
-            fillLight: __WEBPACK_IMPORTED_MODULE_0__gl_Color__["a" /* default */].avg(fill, this.top.fill),
+            fillLight: __WEBPACK_IMPORTED_MODULE_0__gl_Color__["a" /* default */].avg(fill, this.top.fill).mul(220 / 255),
             stroke: new __WEBPACK_IMPORTED_MODULE_0__gl_Color__["a" /* default */](...style.sides.stroke)
         }
 
@@ -386,149 +381,90 @@ class Style {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__math_Util__ = __webpack_require__(6);
+
+
 class Color extends Float32Array {
-    constructor(r, g, b) {
+    /** Creates new Color.
+     * 
+     * @param {Number} r Range <0; 255> default is 0.
+     * @param {Number} g Range <0; 255> default is 0.
+     * @param {Number} b Range <0; 255> default is 0.
+     */
+    constructor(r = 0, g = 0, b = 0) {
         super(3)
-        this[0] = r / 255
-        this[1] = g / 255
-        this[2] = b / 255
+        if (arguments[3] === true) {
+            this[0] = r
+            this[1] = g
+            this[2] = b
+        } else {
+            this[0] = r / 255
+            this[1] = g / 255
+            this[2] = b / 255
+        }
     }
-    static avg(color1, color2) {
-        
+
+    /** Returns new Color created from avg of passed colors.
+     * 
+     * @param {...(Color|Float32Array|Array<Number>)} colors
+     * @returns {Color}
+     *
+     */
+    static avg(...colors) {
+        const n = colors.length
+
+        let rSum = 0
+        let gSum = 0
+        let bSum = 0
+
+        for (const [r, g, b] of colors) {
+            rSum += r
+            gSum += g
+            bSum += b
+        }
+
         return new Color(
-            (color1[0] + color2[0]) / 2 * 220,
-            (color1[1] + color2[1]) / 2 * 220,
-            (color1[2] + color2[2]) / 2 * 220
+            (rSum) / n,
+            (gSum) / n,
+            (bSum) / n,
+            true
         )
+    }
+
+    /** Returns random color. You can specify maximum value per component.
+     * 
+     * @param {Number=} r Range <0;1>
+     * @param {Number=} g Range <0;1>
+     * @param {Number=} b Range <0;1>
+     * @returns {Color}
+     *
+     */
+    static random(r = 1, g = 1, b = 1) {
+        return new Color(Math.random() * r, Math.random() * g, Math.random() * b, true)
+    }
+
+    /** Multiplies each component of color by passed value(s).
+     * 
+     * @param {Number} r  Range <0;1>
+     * @param {Number=} g Range <0;1> default r value.
+     * @param {Number=} b Range <0;1> default r value.
+     * @returns {Color}
+     *
+     */
+    mul(r, g = r, b = r) {
+        this[0] *= r
+        this[1] *= g
+        this[2] *= b
+
+        return this
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Color;
 
 
+
 /***/ }),
 /* 6 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Shader__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Attribute__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Uniform__ = __webpack_require__(21);
-
-
-
-
-/** Appends Attributes and Uniforms from source to target.
- * 
- * @param {Object} target 
- * @param {WebGLRenderingContext} gl 
- * @param {WebGLProgram} program 
- * @param {String} source
- */
-const appendAU = (target, gl, program, source) => {
-    
-    gl.useProgram(program)
-
-    const regex = /^(attribute|uniform)\s+(\w+)\s+(\w+)\s*;/gm
-    let temp
-    while (temp = regex.exec(source)) {
-        const [, type, varType, name] = temp
-        if (target[name]) continue
-        switch (type) {
-            case 'attribute':
-                target[name] = new __WEBPACK_IMPORTED_MODULE_1__Attribute__["a" /* default */](gl, program, name, varType)
-                break
-            case 'uniform':
-                target[name] = new __WEBPACK_IMPORTED_MODULE_2__Uniform__["a" /* default */](gl, program, name, varType)
-                break
-        }
-    }
-}
-
-class Program {
-
-    /** Creates Program.
-     * @param {WebGLRenderingContext} gl
-     */
-    constructor(gl, ...shaders) {
-
-        const program = gl.createProgram()
-
-        for (let i = 0; i < shaders.length; i++) { // creating and attaching shaders
-            if (typeof shaders[i] === 'string')
-                shaders[i] = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shader__["a" /* createShader */])(gl, shaders[i])
-            gl.attachShader(program, shaders[i])
-        }
-
-        gl.linkProgram(program) // linking program
-        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) { // checking for linking errors
-            console.error(`Failed to link program: ${gl.getProgramInfoLog(program)}`)
-            gl.deleteProgram(program)
-            gl.deleteShader(fragment)
-            gl.deleteShader(vertex)
-            return null
-        }
-
-        gl.validateProgram(program) // validating program
-        if (!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {// checking for errors
-            console.error(`Program validation failed: ${gl.getProgramInfoLog(program)}`)
-            gl.deleteProgram(program)
-            gl.deleteShader(fragment)
-            gl.deleteShader(vertex)
-            return null
-        }
-
-        const fullSource = shaders.reduce((source, obj) => {
-            if (typeof obj === 'string') return source + obj + '\n'
-            else return source + obj.source + '\n'
-        }, '')
-        // appending atributes and uniforms
-        appendAU(this, gl, program, fullSource)
-
-        this.__program__ = program
-        this.gl = gl
-        this.shaders = shaders
-    }
-
-    /** Set program as active. */
-    use() {
-        this.gl.useProgram(this.__program__)
-    }
-
-    /** Set all properties of pprogram at once. */
-    set(obj) {
-        for (let name in obj) {
-            this[name].set(obj[name])
-        }
-    }
-
-    /** Call gl.drawArrays. */
-    draw(n, mode = 'POINTS') {
-        this.gl.drawArrays(this.gl[mode.toUpperCase()], 0, n)
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Program;
-
-
-/***/ }),
-/* 7 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-const __SIZE__ = Object.freeze({
-    vec2: 2,
-    vec3: 3,
-    vec4: 4,
-    mat2: 4,
-    mat3: 9,
-    mat4: 16,
-})
-
-const typeSize = type => __SIZE__[type]
-/* harmony export (immutable) */ __webpack_exports__["a"] = typeSize;
-
-
-/***/ }),
-/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -553,14 +489,20 @@ const radToDeg = deg => deg * __180PI__
 /* unused harmony export radToDeg */
 
 
-const approach = (goal, current, dt) => {
+/** Go one step in direction of goal.
+ * @param {Number} goal 
+ * @param {Number} current 
+ * @param {Number} dt
+ * @returns {Number}
+ */
+const approach = (goal, current, step) => {
 
     const distance = goal - current
 
-    if (distance > dt)
-        return current + dt
-    if (distance < -dt)
-        return current - dt
+    if (distance > step)
+        return current + step
+    if (distance < -step)
+        return current - step
 
     return goal
 }
@@ -586,7 +528,7 @@ const side = (p1, p2) => {
 
 
 /***/ }),
-/* 9 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -624,6 +566,144 @@ class Plane {
 
 
 /***/ }),
+/* 8 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Shader__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Attribute__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Uniform__ = __webpack_require__(21);
+
+
+
+
+/** Appends Attributes and Uniforms from source to target.
+ * 
+ * @param {Object} target
+ * @param {WebGLRenderingContext} gl 
+ * @param {WebGLProgram} program 
+ * @param {String} source
+ * 
+ */
+const appendAU = (target, gl, program, source) => {
+
+    gl.useProgram(program)
+
+    const regex = /^(attribute|uniform)\s+(\w+)\s+(\w+)\s*;/gm
+    let temp
+    while (temp = regex.exec(source)) {
+        const [, type, varType, name] = temp
+        if (target[name]) continue
+        switch (type) {
+            case 'attribute':
+                target[name] = new __WEBPACK_IMPORTED_MODULE_1__Attribute__["a" /* default */](gl, program, name, varType)
+                break
+            case 'uniform':
+                target[name] = new __WEBPACK_IMPORTED_MODULE_2__Uniform__["a" /* default */](gl, program, name, varType)
+                break
+        }
+    }
+}
+
+class Program {
+
+    /** Creates Program.
+     * 
+     * @param {WebGLRenderingContext} gl
+     * @param {...(String|WebGLShader)} shaders
+     *
+     */
+    constructor(gl, ...shaders) {
+
+        const program = gl.createProgram()
+
+        for (let i = 0; i < shaders.length; i++) { // creating and attaching shaders
+            if (typeof shaders[i] === 'string') shaders[i] = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__Shader__["a" /* createShader */])(gl, shaders[i])
+            gl.attachShader(program, shaders[i])
+        }
+
+        gl.linkProgram(program) // linking program
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) { // checking for linking errors
+            console.error(`Failed to link program: ${gl.getProgramInfoLog(program)}`)
+            gl.deleteProgram(program)
+            gl.deleteShader(fragment)
+            gl.deleteShader(vertex)
+            return null
+        }
+
+        gl.validateProgram(program) // validating program
+        if (!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {// checking for errors
+            console.error(`Program validation failed: ${gl.getProgramInfoLog(program)}`)
+            gl.deleteProgram(program)
+            gl.deleteShader(fragment)
+            gl.deleteShader(vertex)
+            return null
+        }
+
+        const fullSource = shaders.reduce((source, obj) => {
+            if (typeof obj === 'string') return source + obj + '\n'
+            else return source + obj.source + '\n'
+        }, '')
+        // appending atributes and uniforms
+        appendAU(this, gl, program, fullSource)
+
+        this.__program__ = program
+        this.gl = gl
+        this.shaders = shaders
+    }
+
+    /** Set program as active.
+     * @returns {void}
+     */
+    use() {
+        this.gl.useProgram(this.__program__)
+    }
+
+    /** Set all properties of program at once.
+     * @param {Object} obj
+     * @returns {void}
+     */
+    set(obj) {
+        for (let name in obj) {
+            this[name].set(obj[name])
+        }
+    }
+
+    /** Call gl.drawArrays.
+     * @returns {void}
+     */
+    draw(n, mode = 'POINTS') {
+        this.gl.drawArrays(this.gl[mode.toUpperCase()], 0, n)
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Program;
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+const __SIZE__ = { // Works like a lookup hashtable.
+    vec2: 2,
+    vec3: 3,
+    vec4: 4,
+    mat2: 4,
+    mat3: 9,
+    mat4: 16
+}
+
+/** Returns a size of type.
+ * 
+ * @param {String} type
+ * @returns {Number}
+ *
+ */
+const typeSize = type => __SIZE__[type]
+/* harmony export (immutable) */ __webpack_exports__["a"] = typeSize;
+
+
+/***/ }),
 /* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -658,7 +738,7 @@ class Sphere {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__math_Mat4__ = __webpack_require__(24);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__math_Util__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__math_Util__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__entities_Player__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__gl_programs_basic_Program__ = __webpack_require__(22);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__gl_programs_pixelize_Program__ = __webpack_require__(23);
@@ -709,7 +789,7 @@ function Game({
 
     // creating programs
     const bp = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__gl_programs_basic_Program__["a" /* default */])(gl) // basicProgram
-
+    
     if (__WEBPACK_IMPORTED_MODULE_5__Settings__["a" /* default */].pixelFilter) {
         var pp = new __WEBPACK_IMPORTED_MODULE_4__gl_programs_pixelize_Program__["a" /* default */](gl, canvas) // PixelizeProgram
     }
@@ -719,6 +799,12 @@ function Game({
 
     // initializing DOM
     appendTo.appendChild(canvas)
+    const info = document.createElement('div')
+    info.style.height = '100%'
+    info.style.width = '17.5%'
+    info.style.position = 'absolute'
+    info.style.top = 0
+    appendTo.appendChild(info)
 
     control.addEventListener('keydown', e => {
         switch (e.keyCode) {
@@ -779,7 +865,7 @@ function Game({
         if (this.map) {
             if (this.map.mapBackround) gl.clearColor(...this.map.mapBackround, 1)
         } else this.map = { elements: [] }
-        
+
         console.log(map)
     }
 
@@ -887,7 +973,7 @@ module.exports = "precision lowp float;\r\n\r\nattribute vec2 position;\r\nattri
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__objects_Arrow__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__entities_Diamond__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__gl_Color__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__objects_Water__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__objects_Water__ = __webpack_require__(29);
 
 
 
@@ -1006,10 +1092,10 @@ class Map {
 
         }
         for (var i = 0; i < this.selfDrawn.length; i++) {
-            this.selfDrawn[i].draw(bp, gl)
+            this.selfDrawn[i].draw(bp, gl, this.styleGroups)
         }
         for (var i = 0; i < this.entities.length; i++) {
-            this.entities[i].draw(bp, gl)
+            this.entities[i].draw(bp, gl, this.styleGroups)
         }
     }
 }
@@ -1026,7 +1112,9 @@ class Map {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Style__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__physics_coliders_Sphere__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Settings__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Resources__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__gl_Color__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__Resources__ = __webpack_require__(2);
+
 
 
 
@@ -1086,14 +1174,14 @@ class Player {
         this.t = 0
         this.collected = false
     }
-    draw(bp, gl) {
+    draw(bp, gl, style) {
         if (this.collected) return
         const pos = new __WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */](this.sphere.p[0] * s, this.sphere.p[1] * s, this.sphere.p[2])
         bp.position.set(pos)
 
         for (let i = 0; i < 8; i++) {
             bp.vert.set(this.sides[i])
-            bp.color.set(new Float32Array([Math.random(), Math.random(), Math.random()]))
+            bp.color.set(__WEBPACK_IMPORTED_MODULE_5__gl_Color__["a" /* default */].random())
             gl.drawArrays(gl.TRIANGLES, 0, this.sides[i].length / 3)
             bp.color.set(black)
             gl.drawArrays(gl.LINE_LOOP, 0, this.sides[i].length / 3)
@@ -1107,7 +1195,7 @@ class Player {
             Math.abs(game.player.sphere.p[2] - this.sphere.p[2]) > 0.1
         ) {
             this.collected = true
-            __WEBPACK_IMPORTED_MODULE_5__Resources__["b" /* default */].sounds.diamond.play()
+            __WEBPACK_IMPORTED_MODULE_6__Resources__["b" /* default */].sounds.diamond.play()
         }
     }
 }
@@ -1125,8 +1213,8 @@ class Player {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Style__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__physics_coliders_Sphere__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Settings__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__math_Util__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__physics_const__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__math_Util__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__physics_const__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__Resources__ = __webpack_require__(2);
 
 
@@ -1227,7 +1315,7 @@ class Player {
             if (dy > 0.5) continue
 
             var topData = blocks.elements[i].topPlane.intersect(this.sphere)
-
+            
             if (topData[1] > 0 && topData[0] < this.sphere.r) {
                 var v = (__WEBPACK_IMPORTED_MODULE_1__math_Vec3__["a" /* default */].scale(blocks.elements[i].topPlane.norm, -topData[0]))
 
@@ -1303,16 +1391,18 @@ class Player {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__types_js__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__types_js__ = __webpack_require__(9);
 
 
 class Attribute {
 
     /** Creates attribute.
+     *
      * @param {WebGLRenderingContext} gl
      * @param {WebGLProgram} program
-     * @param {String} name
-     * @param {String} type
+     * @param {String} name attribute name
+     * @param {String} type attribute type
+     *
      */
     constructor(gl, program, name, type) {
 
@@ -1326,15 +1416,17 @@ class Attribute {
     }
 
     /** Sets value of curent attribute and enables it.
-     *  NOTE: Remember to use program.
-     * @param {Float32Array} value 
+     *
+     * NOTE: Remember to use program.
+     * @param {Float32Array} value
+     * @returns {void}
+     *
      */
     set(value) {
         this.gl.enableVertexAttribArray(this.__location__)
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.__buffer__)
         this.gl.bufferData(this.gl.ARRAY_BUFFER, value, this.gl.STATIC_DRAW)
         this.gl.vertexAttribPointer(this.__location__, this.size, this.gl.FLOAT, false, 0, 0)
-
     }
 
 }
@@ -1351,6 +1443,7 @@ class Attribute {
  * @param {WebGLRenderingContext} gl 
  * @param {String} source
  * @returns {WebGLShader}
+ * 
  */
 const createShader = (gl, source) => {
 
@@ -1379,16 +1472,18 @@ const createShader = (gl, source) => {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__types__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__types__ = __webpack_require__(9);
 
 
 class Uniform {
 
     /** Creates Uniform.
+     * 
      * @param {WebGLRenderingContext} gl
      * @param {WebGLProgram} program
      * @param {String} name
      * @param {String} type
+     * 
      */
     constructor(gl, program, name, type) {
         
@@ -1403,8 +1498,11 @@ class Uniform {
     }
 
     /** Sets value of curent attribute and enables it.
+     * 
      *  NOTE: Remember to use program.
-     * @param {Float32Array} value 
+     * @param {Float32Array|Mat4|Vec3|Vec4|Color} value 
+     * @returns {void}
+     *
      */
     set(value) {
         switch (this.size) {
@@ -1428,7 +1526,7 @@ class Uniform {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Program__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Program__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Vertex_glsl__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Vertex_glsl___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__Vertex_glsl__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Fragment_glsl__ = __webpack_require__(12);
@@ -1439,9 +1537,11 @@ class Uniform {
 
 
 /** Basic Program.
- * Flat color.
+ *
+ * Flat color vec3.
  * Projection matrix.
- * Position.
+ * Position vec3.
+ *
  */
 /* harmony default export */ __webpack_exports__["a"] = gl => new __WEBPACK_IMPORTED_MODULE_0__Program__["a" /* default */](gl, __WEBPACK_IMPORTED_MODULE_1__Vertex_glsl___default.a, __WEBPACK_IMPORTED_MODULE_2__Fragment_glsl___default.a);
 
@@ -1450,7 +1550,7 @@ class Uniform {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Program__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Program__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__vertex_glsl__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__vertex_glsl___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__vertex_glsl__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__fragment_glsl__ = __webpack_require__(14);
@@ -1573,7 +1673,9 @@ class Mat4 extends Float32Array {
 
     mul(m, out = this) {
 
-        const temp = new Array(16)
+        const temp = []
+        temp.length = 16
+
         temp[0] = this[0] * m[0] + this[4] * m[1] + this[8] * m[2] + this[12] * m[3]
         temp[1] = this[0] * m[4] + this[4] * m[5] + this[8] * m[6] + this[12] * m[7]
         temp[2] = this[0] * m[8] + this[4] * m[9] + this[8] * m[10] + this[12] * m[11]
@@ -1612,8 +1714,6 @@ class Mat4 extends Float32Array {
         return out
     }
 
-    copy(input) { this.set(...input) }
-    clone() { return new Mat4(...this) }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Mat4;
 
@@ -1655,13 +1755,15 @@ const req = (options) => {
      * 
      * @param {{url:String, data, method: String}} options
      * @returns {Promise}
+     * 
      */
     get(options) { return req(options) },
 
-    /** Get data  using axaj and parser it using JSON.parse().
+    /** Get data using axaj and parses it using JSON.parse().
      * 
      * @param {{url:String, data, method: String}} options
      * @returns {Promise}
+     * 
      */
     json(options) { return req(options).then(data => JSON.parse(data)) }
 };
@@ -1686,54 +1788,30 @@ class Arrow {
         switch (dir) {
             case 0:
                 this.shape = new Float32Array([
-                    .5, .1, 0,
-                    .1, .5, 0,
-                    .9, .5, 0,
-                    .4, .5, 0,
-                    .4, .9, 0,
-                    .6, .9, 0,
-                    .6, .5, 0,
-                    .4, .5, 0,
-                    .6, .9, 0,
+                    0.5, 0.1, 0.0, 0.1, 0.5, 0.0, 0.9, 0.5, 0.0,
+                    0.4, 0.5, 0.0, 0.4, 0.9, 0.0, 0.6, 0.9, 0.0,
+                    0.6, 0.5, 0.0, 0.4, 0.5, 0.0, 0.6, 0.9, 0.0
                 ])
                 break
             case 1:
                 this.shape = new Float32Array([
-                    .1, .5, 0,
-                    .5, .1, 0,
-                    .5, .9, 0,
-                    .5, .4, 0,
-                    .9, .4, 0,
-                    .9, .6, 0,
-                    .5, .6, 0,
-                    .5, .4, 0,
-                    .9, .6, 0,
+                    0.1, 0.5, 0.0, 0.5, 0.1, 0.0, 0.5, 0.9, 0.0,
+                    0.5, 0.4, 0.0, 0.9, 0.4, 0.0, 0.9, 0.6, 0.0,
+                    0.5, 0.6, 0.0, 0.5, 0.4, 0.0, 0.9, 0.6, 0.0
                 ])
                 break
             case 2:
                 this.shape = new Float32Array([
-                    0.5, 0.9, 0,
-                    0.9, 0.5, 0,
-                    0.1, 0.5, 0,
-                    0.6, 0.5, 0,
-                    0.6, 0.1, 0,
-                    0.4, 0.1, 0,
-                    0.4, 0.5, 0,
-                    0.6, 0.5, 0,
-                    0.4, 0.1, 0
+                    0.5, 0.9, 0.0, 0.9, 0.5, 0.0, 0.1, 0.5, 0.0,
+                    0.6, 0.5, 0.0, 0.6, 0.1, 0.0, 0.4, 0.1, 0.0,
+                    0.4, 0.5, 0.0, 0.6, 0.5, 0.0, 0.4, 0.1, 0.0
                 ])
                 break
             case 3:
                 this.shape = new Float32Array([
-                    0.9, 0.5, 0,
-                    0.5, 0.9, 0,
-                    0.5, 0.1, 0,
-                    0.5, 0.6, 0,
-                    0.1, 0.6, 0,
-                    0.1, 0.4, 0,
-                    0.5, 0.4, 0,
-                    0.5, 0.6, 0,
-                    0.1, 0.4, 0
+                    0.9, 0.5, 0.0, 0.5, 0.9, 0.0, 0.5, 0.1, 0.0,
+                    0.5, 0.6, 0.0, 0.1, 0.6, 0.0, 0.1, 0.4, 0.0,
+                    0.5, 0.4, 0.0, 0.5, 0.6, 0.0, 0.1, 0.4, 0.0
                 ])
                 break
         }
@@ -1755,7 +1833,7 @@ class Arrow {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Shape__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__physics_coliders_Plane__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__physics_coliders_Plane__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__math_Vec3__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Settings__ = __webpack_require__(1);
 
@@ -1853,7 +1931,7 @@ class Flat {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Shape__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__physics_coliders_Plane__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__physics_coliders_Plane__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__math_Vec3__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Settings__ = __webpack_require__(1);
 
@@ -1953,42 +2031,8 @@ class Slide {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__math_Vec3__ = __webpack_require__(0);
-
-
-const Gravity = new __WEBPACK_IMPORTED_MODULE_0__math_Vec3__["a" /* default */](0, 0, .5)
-/* harmony export (immutable) */ __webpack_exports__["a"] = Gravity;
-
-
-/***/ }),
-/* 30 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Game__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Resources__ = __webpack_require__(2);
-
-
-
-
-
-__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__Resources__["a" /* waitForResources */])().then(() => {
-    const game = new __WEBPACK_IMPORTED_MODULE_0__Game__["a" /* default */]({
-        appendTo: document.getElementById('game'),
-        control: window
-    })
-    game.map = __WEBPACK_IMPORTED_MODULE_1__Resources__["b" /* default */].maps['0000']
-    game.start()
-})
-
-/***/ }),
-/* 31 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Shape__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__physics_coliders_Plane__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__physics_coliders_Plane__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__math_Vec3__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Settings__ = __webpack_require__(1);
 
@@ -2010,13 +2054,8 @@ class Water {
             [width * s, height * s, 0],
             [0, height * s, 0]
         ])
-        window.set = (x, y, z) => {
-            this.position[0] = x
-            this.position[1] = y
-            this.position[2] = z
-        }
-
     }
+    
     draw(bp, gl) {
         bp.position.set(this.position)
         bp.vert.set(this.top)
@@ -2027,6 +2066,40 @@ class Water {
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Water;
 
+
+/***/ }),
+/* 30 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__math_Vec3__ = __webpack_require__(0);
+
+
+const Gravity = new __WEBPACK_IMPORTED_MODULE_0__math_Vec3__["a" /* default */](0, 0, .5)
+/* harmony export (immutable) */ __webpack_exports__["a"] = Gravity;
+
+
+/***/ }),
+/* 31 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Game__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Resources__ = __webpack_require__(2);
+
+
+
+
+
+__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__Resources__["a" /* waitForResources */])().then(() => {
+    const game = new __WEBPACK_IMPORTED_MODULE_0__Game__["a" /* default */]({
+        appendTo: document.getElementById('game'),
+        control: window
+    })
+    game.map = __WEBPACK_IMPORTED_MODULE_1__Resources__["b" /* default */].maps['0000']
+    game.start()
+})
 
 /***/ })
 /******/ ]);

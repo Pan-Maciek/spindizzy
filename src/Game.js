@@ -42,7 +42,7 @@ export default function Game({
 
     // creating programs
     const bp = BasicProgram(gl) // basicProgram
-
+    
     if (Settings.pixelFilter) {
         var pp = new PixelProgram(gl, canvas) // PixelizeProgram
     }
@@ -52,6 +52,12 @@ export default function Game({
 
     // initializing DOM
     appendTo.appendChild(canvas)
+    const info = document.createElement('div')
+    info.style.height = '100%'
+    info.style.width = '17.5%'
+    info.style.position = 'absolute'
+    info.style.top = 0
+    appendTo.appendChild(info)
 
     control.addEventListener('keydown', e => {
         switch (e.keyCode) {
@@ -112,7 +118,7 @@ export default function Game({
         if (this.map) {
             if (this.map.mapBackround) gl.clearColor(...this.map.mapBackround, 1)
         } else this.map = { elements: [] }
-        
+
         console.log(map)
     }
 

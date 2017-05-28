@@ -3,10 +3,12 @@ import { typeSize } from './types'
 export default class Uniform {
 
     /** Creates Uniform.
+     * 
      * @param {WebGLRenderingContext} gl
      * @param {WebGLProgram} program
      * @param {String} name
      * @param {String} type
+     * 
      */
     constructor(gl, program, name, type) {
         
@@ -21,8 +23,11 @@ export default class Uniform {
     }
 
     /** Sets value of curent attribute and enables it.
+     * 
      *  NOTE: Remember to use program.
-     * @param {Float32Array} value 
+     * @param {Float32Array|Mat4|Vec3|Vec4|Color} value 
+     * @returns {void}
+     *
      */
     set(value) {
         switch (this.size) {

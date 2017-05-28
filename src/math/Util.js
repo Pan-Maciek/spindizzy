@@ -14,14 +14,20 @@ export const degToRad = deg => deg * __PI180__
  */
 export const radToDeg = deg => deg * __180PI__
 
-export const approach = (goal, current, dt) => {
+/** Go one step in direction of goal.
+ * @param {Number} goal 
+ * @param {Number} current 
+ * @param {Number} dt
+ * @returns {Number}
+ */
+export const approach = (goal, current, step) => {
 
     const distance = goal - current
 
-    if (distance > dt)
-        return current + dt
-    if (distance < -dt)
-        return current - dt
+    if (distance > step)
+        return current + step
+    if (distance < -step)
+        return current - step
 
     return goal
 }

@@ -29,13 +29,15 @@ export default {
      * 
      * @param {{url:String, data, method: String}} options
      * @returns {Promise}
+     * 
      */
     get(options) { return req(options) },
 
-    /** Get data  using axaj and parser it using JSON.parse().
+    /** Get data using axaj and parses it using JSON.parse().
      * 
      * @param {{url:String, data, method: String}} options
      * @returns {Promise}
+     * 
      */
     json(options) { return req(options).then(data => JSON.parse(data)) }
 }

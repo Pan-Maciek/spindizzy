@@ -1,11 +1,10 @@
 {
   "name": "spindizzy",
-  "version": "1.0.0",
+  "version": "1.3.11",
   "description": "remake of atari 8bit game called spindizzy",
   "main": "./src/main.js",
   "scripts": {
-    "start": "webpack --watch",
-    "test": "jasmine ./build/test.bundle.js"
+    "start": "webpack --watch"
   },
   "repository": {
     "type": "git",

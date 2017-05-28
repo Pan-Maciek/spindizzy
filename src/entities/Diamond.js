@@ -3,6 +3,7 @@ import Vec3 from '../math/Vec3'
 import Style from '../Style'
 import Sphere from '../physics/coliders/Sphere'
 import Settings from '../Settings'
+import Color from '../gl/Color'
 
 const s = 1 + Settings.blocksSpacing
 import Resources from '../Resources'
@@ -57,14 +58,14 @@ export default class Player {
         this.t = 0
         this.collected = false
     }
-    draw(bp, gl) {
+    draw(bp, gl, style) {
         if (this.collected) return
         const pos = new Vec3(this.sphere.p[0] * s, this.sphere.p[1] * s, this.sphere.p[2])
         bp.position.set(pos)
 
         for (let i = 0; i < 8; i++) {
             bp.vert.set(this.sides[i])
-            bp.color.set(new Float32Array([Math.random(), Math.random(), Math.random()]))
+            bp.color.set(Color.random())
             gl.drawArrays(gl.TRIANGLES, 0, this.sides[i].length / 3)
             bp.color.set(black)
             gl.drawArrays(gl.LINE_LOOP, 0, this.sides[i].length / 3)

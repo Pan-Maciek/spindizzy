@@ -116,10 +116,10 @@ export default class Map {
 
         }
         for (var i = 0; i < this.selfDrawn.length; i++) {
-            this.selfDrawn[i].draw(bp, gl)
+            this.selfDrawn[i].draw(bp, gl, this.styleGroups)
         }
         for (var i = 0; i < this.entities.length; i++) {
-            this.entities[i].draw(bp, gl)
+            this.entities[i].draw(bp, gl, this.styleGroups)
         }
     }
 }

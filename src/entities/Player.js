@@ -97,7 +97,7 @@ export default class Player {
             if (dy > 0.5) continue
 
             var topData = blocks.elements[i].topPlane.intersect(this.sphere)
-
+            
             if (topData[1] > 0 && topData[0] < this.sphere.r) {
                 var v = (Vec3.scale(blocks.elements[i].topPlane.norm, -topData[0]))
 

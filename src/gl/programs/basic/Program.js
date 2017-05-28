@@ -4,8 +4,10 @@ import Vertex from './Vertex.glsl'
 import Fragment from './Fragment.glsl'
 
 /** Basic Program.
- * Flat color.
+ *
+ * Flat color vec3.
  * Projection matrix.
- * Position.
+ * Position vec3.
+ *
  */
 export default gl => new Program(gl, Vertex, Fragment)

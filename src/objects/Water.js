@@ -17,13 +17,8 @@ export default class Water {
             [width * s, height * s, 0],
             [0, height * s, 0]
         ])
-        window.set = (x, y, z) => {
-            this.position[0] = x
-            this.position[1] = y
-            this.position[2] = z
-        }
-
     }
+    
     draw(bp, gl) {
         bp.position.set(this.position)
         bp.vert.set(this.top)

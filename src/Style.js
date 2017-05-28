@@ -1,4 +1,5 @@
 import Color from './gl/Color'
+
 export default class Style {
     constructor(style) {
         this.top = {
@@ -8,7 +9,7 @@ export default class Style {
         let fill = new Color(...style.sides.fill)
         this.sides = {
             fill,
-            fillLight: Color.avg(fill, this.top.fill),
+            fillLight: Color.avg(fill, this.top.fill).mul(220 / 255),
             stroke: new Color(...style.sides.stroke)
         }
 

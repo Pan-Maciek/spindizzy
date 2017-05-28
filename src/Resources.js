@@ -31,9 +31,8 @@ const loadMap = ID => {
 }
 
 const loadMaps = (...maps) => {
-    for (const map of maps) {
+    for (const map of maps) 
         loadMap(map)
-    }
 }
 
 const __RESOURCES__ = {

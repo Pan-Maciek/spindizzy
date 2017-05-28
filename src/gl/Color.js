@@ -22,7 +22,7 @@ export default class Color extends Float32Array {
 
     /** Returns new Color created from avg of passed colors.
      * 
-     * @param {... Color|Float32Array|Array<Number>} colors
+     * @param {...(Color|Float32Array|Array<Number>)} colors
      * @returns {Color}
      *
      */

@@ -51,7 +51,9 @@ export default class Mat4 extends Float32Array {
 
     mul(m, out = this) {
 
-        const temp = new Array(16)
+        const temp = []
+        temp.length = 16
+
         temp[0] = this[0] * m[0] + this[4] * m[1] + this[8] * m[2] + this[12] * m[3]
         temp[1] = this[0] * m[4] + this[4] * m[5] + this[8] * m[6] + this[12] * m[7]
         temp[2] = this[0] * m[8] + this[4] * m[9] + this[8] * m[10] + this[12] * m[11]
@@ -90,6 +92,4 @@ export default class Mat4 extends Float32Array {
         return out
     }
 
-    copy(input) { this.set(...input) }
-    clone() { return new Mat4(...this) }
 }

@@ -4,13 +4,14 @@ import Uniform from './Uniform'
 
 /** Appends Attributes and Uniforms from source to target.
  * 
- * @param {Object} target 
+ * @param {Object} target
  * @param {WebGLRenderingContext} gl 
  * @param {WebGLProgram} program 
  * @param {String} source
+ * 
  */
 const appendAU = (target, gl, program, source) => {
-    
+
     gl.useProgram(program)
 
     const regex = /^(attribute|uniform)\s+(\w+)\s+(\w+)\s*;/gm
@@ -32,15 +33,17 @@ const appendAU = (target, gl, program, source) => {
 export default class Program {
 
     /** Creates Program.
+     * 
      * @param {WebGLRenderingContext} gl
+     * @param {...(String|WebGLShader)} shaders
+     *
      */
     constructor(gl, ...shaders) {
 
         const program = gl.createProgram()
 
         for (let i = 0; i < shaders.length; i++) { // creating and attaching shaders
-            if (typeof shaders[i] === 'string')
-                shaders[i] = createShader(gl, shaders[i])
+            if (typeof shaders[i] === 'string') shaders[i] = createShader(gl, shaders[i])
             gl.attachShader(program, shaders[i])
         }
 
@@ -74,19 +77,26 @@ export default class Program {
         this.shaders = shaders
     }
 
-    /** Set program as active. */
+    /** Set program as active.
+     * @returns {void}
+     */
     use() {
         this.gl.useProgram(this.__program__)
     }
 
-    /** Set all properties of pprogram at once. */
+    /** Set all properties of program at once.
+     * @param {Object} obj
+     * @returns {void}
+     */
     set(obj) {
         for (let name in obj) {
             this[name].set(obj[name])
         }
     }
 
-    /** Call gl.drawArrays. */
+    /** Call gl.drawArrays.
+     * @returns {void}
+     */
     draw(n, mode = 'POINTS') {
         this.gl.drawArrays(this.gl[mode.toUpperCase()], 0, n)
     }

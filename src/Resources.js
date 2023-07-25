@@ -1,16 +1,11 @@
-import remote from './net/remote'
 import Map from './Map'
 
-const __PROMISSES__ = [
-    new Promise((resolve) => {
-        window.addEventListener('load', resolve)
-    })
-]
+const __PROMISSES__ = []
 const load = (resourceName, url, appendTo = __RESOURCES__.maps) => {
     url = location.href + url.match(/\.?\/?(.*)/)[1]
 
     if (/\.json$/.test(url)) {
-        const prom = remote.json({ url })
+        const prom = fetch(url).then(res => res.json())
         __PROMISSES__.push(prom.then(json => {
             appendTo[resourceName] = new Map(json)
         }))
@@ -26,9 +21,7 @@ const load = (resourceName, url, appendTo = __RESOURCES__.maps) => {
     }
 }
 
-const loadMap = ID => {
-    load(ID, `./resources/maps/map${ID}.json`)
-}
+const loadMap = ID => load(ID, `./resources/maps/map${ID}.json`)
 
 const loadMaps = (...maps) => {
     for (const map of maps) 
@@ -57,4 +50,3 @@ load('diamond', './resources/sound/diamond.mp3', __RESOURCES__.sounds)
 export const waitForResources = () => Promise.all(__PROMISSES__)
 
 export default __RESOURCES__
-window.r = __RESOURCES__

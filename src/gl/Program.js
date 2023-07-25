@@ -2,6 +2,10 @@ import { createShader } from './Shader'
 import Attribute from './Attribute'
 import Uniform from './Uniform'
 
+const constructors = {
+    attribute: Attribute,
+    uniform: Uniform,
+}
 /** Appends Attributes and Uniforms from source to target.
  * 
  * @param {Object} target
@@ -10,23 +14,14 @@ import Uniform from './Uniform'
  * @param {String} source
  * 
  */
-const appendAU = (target, gl, program, source) => {
-
+function appendAU(target, gl, program, source) {
     gl.useProgram(program)
 
-    const regex = /^(attribute|uniform)\s+(\w+)\s+(\w+)\s*;/gm
-    let temp
-    while (temp = regex.exec(source)) {
-        const [, type, varType, name] = temp
-        if (target[name]) continue
-        switch (type) {
-            case 'attribute':
-                target[name] = new Attribute(gl, program, name, varType)
-                break
-            case 'uniform':
-                target[name] = new Uniform(gl, program, name, varType)
-                break
-        }
+    const regex = /^(?<kind>attribute|uniform)\s+(?<type>\w+)\s+(?<name>\w+)\s*;/gm
+    for (let match of source.matchAll(regex)) {
+        const { kind, type, name } = match.groups
+        if (target[name]) throw new Error(`Name collision: ${name}`)
+        target[name] = new constructors[kind](gl, program, name, type)
     }
 }
 

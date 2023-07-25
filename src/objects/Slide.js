@@ -1,4 +1,4 @@
-import { drawShape, shape } from '../Shape'
+import { shape } from '../Shape'
 import Plane from '../physics/coliders/Plane'
 import Vec3 from '../math/Vec3'
 import Settings from '../Settings'

@@ -1,5 +1,3 @@
-import { avg } from '../math/Util'
-
 export default class Color extends Float32Array {
     /** Creates new Color.
      * 

@@ -1,7 +1,7 @@
 import Program from '../../Program'
 
-import vertex from './vertex.glsl'
-import fragment from './fragment.glsl'
+import vertex from './vertex.glsl?raw'
+import fragment from './fragment.glsl?raw'
 import Settings from '../../../Settings'
 
 const pos = new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1])

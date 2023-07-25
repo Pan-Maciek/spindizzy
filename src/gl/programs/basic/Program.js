@@ -1,7 +1,7 @@
 import Program from '../../Program'
 
-import Vertex from './Vertex.glsl'
-import Fragment from './Fragment.glsl'
+import Vertex from './Vertex.glsl?raw'
+import Fragment from './Fragment.glsl?raw'
 
 /** Basic Program.
  *

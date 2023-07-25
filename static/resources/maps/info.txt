@@ -1,0 +1,9 @@
+map[lewo][prawo][tył][przód]
+
+t -           - prawo
+    -       -
+      -   -
+        -
+      -   -
+    -       -
+l -           - p

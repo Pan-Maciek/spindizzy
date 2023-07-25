@@ -1,0 +1,22 @@
+body {
+    margin: 0;
+    font-family: 'Press Start 2P', cursive;
+}
+
+#game {
+    height: 100vmin;
+    width: 100vmin;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%)
+}
+
+#debbug {
+    position: fixed;
+    top: 0;
+    right: 0;
+    background-color: black;
+    color: #fff;
+    font-family: sans-serif
+}
